@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1422"><title>モンスト ジェスチャー設定ツール v4.1</title>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1422"><title>モンスト ジェスチャー設定ツール v1.0</title>
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;color:#eef6ff;background:#091321;font-synthesis:none}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -140px,#182d46 0%,#0a1524 55%,#09111e 100%);line-height:1.45}
@@ -14,6 +14,13 @@ header{display:flex;align-items:center;gap:17px;margin:0 5px 14px}.brand-icon{wi
 .btn-blue{background:linear-gradient(#29aeff,#0876ee);border-color:#77ddff;color:#fff}.btn-green{background:linear-gradient(#03be66,#009b4f);border-color:#55f3a9;color:#fff}.btn.wide{width:100%;min-height:57px;font-size:18px}
 .fileLabel{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;cursor:pointer;flex-shrink:0}.filename{min-width:0;flex:1;color:#d9e6f4;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 input[type=file]{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+/* Use the native file picker for iPhone, without an extension/MIME filter. */
+#sourceFile{position:static;opacity:1;width:100%;height:auto;pointer-events:auto;background:#13233a;border:1px solid #5c86ad;border-radius:10px;padding:12px 8px;color:#e9f6ff;font-size:12px;display:block}
+.source-help{font-size:12px;color:#bed5e8;line-height:1.65;padding:5px 1px}
+#sourceReadStatus{border:1px solid #526b83;border-radius:9px;padding:10px 12px;white-space:pre-wrap;color:#c7dff2;font-size:12px;background:#10283c;line-height:1.6}
+#sourceReadStatus.ok{border-color:#15ae75;background:#0a3429;color:#c9f8e0}
+#sourceReadStatus.err{border-color:#d59b3c;background:#3a2c1c;color:#ffe3ae}
+
 .preview-holder{position:relative;background:#0c1521;border:1px solid #3b526f;border-radius:6px;overflow:hidden;min-height:460px;height: min(64vw,760px);max-height:820px;display:flex;justify-content:center;align-items:center}
 .preview-holder.empty{border:1px dashed #516985;background:linear-gradient(145deg,#101b2b,#0d1623)}
 #photoCanvas{width:100%;height:100%;display:block;object-fit:contain;touch-action:pan-y}.preview-holder.empty #photoCanvas{display:none}
@@ -44,21 +51,21 @@ input[type=range]{width:100%;accent-color:#168cf9;min-width:0;cursor:pointer;hei
 <main>
 <header>
 <div class="brand-icon" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="5"/><circle cx="30" cy="30" r="6" fill="currentColor"/><path d="M30 2v15M30 43v15M2 30h15M43 30h15" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg></div>
-<div><h1>モンスト ジェスチャー設定ツール v4.1</h1><p class="lead">薄い透明な軌道線の<strong>中心</strong>を検出して角度を計算。細かい角度調整にも対応。</p></div>
+<div><h1>モンスト ジェスチャー設定ツール v1.0</h1><p class="lead">矢印から伸びる軌道線の中心を検出し、角度を設定できます。</p></div>
 <button class="help" id="helpBtn">？ 使い方</button></header>
 <nav class="tabbar" aria-label="編集モード"><button class="tab active" data-tab="image">▧　画像から角度を設定（自動検出）</button><button class="tab" data-tab="manual">⚒　手動で設定</button><button class="tab" data-tab="commands">☷　コマンド一覧</button></nav>
 <div class="work">
 <div class="stack left">
 <section class="panel" id="imagePanel"><div class="panel-pad">
 <div class="filebar"><label for="imageFile" class="btn btn-blue fileLabel">▣ 画像を選択</label><input id="imageFile" type="file" accept="image/*"><span class="filename" id="imageName">画像は未選択です</span><button class="btn" id="clearImage">× クリア</button></div>
-<div class="preview-holder empty" id="photoHolder"><canvas id="photoCanvas" width="430" height="1000" aria-label="画像上の検出結果"></canvas><div id="emptyDisplay" class="empty-display"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="2"/><path d="m3 18 6-6 4 4 3-3 5 5"/></svg><strong>画像を選択してください</strong><span>最初に画像は表示されません。<br>モンストのスクリーンショットを読み込むと、<br>青・赤の矢印付近から伸びる軌道線を探します。</span></div><div class="photoTools" id="photoTools" hidden><button id="zoomIn" title="拡大">＋</button><button id="zoomOut" title="縮小">−</button><button id="zoomReset" title="全体表示">⛶</button></div></div>
-<p class="photoHints">画像は端末内だけで解析し、外部には送信しません。青／赤の矢印から伸びる線を探します。必要なら画像内の矢印を1回タップすると、その位置を基準に線を選べます。</p>
+<div class="preview-holder empty" id="photoHolder"><canvas id="photoCanvas" width="430" height="1000" aria-label="画像上の検出結果"></canvas><div id="emptyDisplay" class="empty-display"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="2"/><path d="m3 18 6-6 4 4 3-3 5 5"/></svg><strong>画像を選択してください</strong><span>スクリーンショットを選ぶと軌道線を検出します。</span></div><div class="photoTools" id="photoTools" hidden><button id="zoomIn" title="拡大">＋</button><button id="zoomOut" title="縮小">−</button><button id="zoomReset" title="全体表示">⛶</button></div></div>
+<p class="photoHints">赤・青の矢印から伸びる軌道線を探します。ずれる場合は矢印の位置をタップしてください。</p>
 </div></section>
 <section class="panel hidden" id="manualPanel"><h2 class="panel-title">手動設定（距離に連動するプレビュー）</h2><div class="manual-surface"><canvas id="manualCanvas" width="470" height="420" aria-label="角度の大きなプレビュー"></canvas></div><div class="panel-pad"><p class="subtle">0°＝上、90°＝右、180°＝下、270°＝左。なぞり距離を変えるとプレビューの矢印も伸び縮みします。最大距離では表示領域の端まで伸びます。</p><label class="fieldlabel" for="manualRange">角度スライダー</label><input type="range" id="manualRange" min="0" max="360" step="0.001" value="0"></div></section>
 <section class="panel hidden" id="commandsPanel"><h2 class="panel-title">登録コマンドの編集</h2><div class="list" id="commandListLeft"></div><p class="subtle" style="padding:0 14px 12px">「編集」で設定を呼び出して変更し、再度登録できます。</p></section>
 </div>
 <div class="stack middle">
-<section class="panel"><div class="panel-pad"><h2>矢印から伸びる軌道線を検出</h2>
+<section class="panel"><div class="panel-pad"><h2>軌道線の自動検出</h2>
 <div class="detect-row"><span style="font-size:13px;font-weight:700">◎ 青・赤の矢印からの線を検出</span><label class="toggle"><input id="autoToggle" type="checkbox" checked aria-label="画像読み込み時の自動検出"><span class="track"></span></label></div>
 <div class="source-picker"><label for="arrowSource">基準にする矢印</label><select id="arrowSource"><option value="red" selected>赤い矢印から伸びる線（ピンク系）</option><option value="blue">青い矢印から伸びる線（黄色系）</option><option value="auto">自動で判定（赤・青両方）</option></select><button class="btn" type="button" id="pickArrow">◎ 画像で矢印の位置を1回タップ</button><button class="btn hidden" type="button" id="clearAnchor">位置指定を解除</button><div class="micro" id="arrowHint">画像の読み込み後、赤い矢印から伸びる線を優先します。</div></div><div class="detect-status" id="detectStatus"><span class="status-icon" id="detectIcon">◎</span><div><strong id="detectHeading">画像を待機しています</strong><span id="detectText">画像を選択すると軌道線を解析します。</span></div></div>
 <div id="candidateArea" class="hidden"><div class="subtle">軌道線の候補（線の中心を表示）</div><div class="candidateBtns" id="candidateBtns"></div></div>
@@ -77,15 +84,15 @@ input[type=range]{width:100%;accent-color:#168cf9;min-width:0;cursor:pointer;hei
 <div class="control"><label for="xRange">開始 X</label><input id="xRange" type="range" min="0" max="430" value="195"><span class="value" id="xOut">195</span></div>
 <div class="control"><label for="yRange">開始 Y</label><input id="yRange" type="range" min="0" max="1050" value="770"><span class="value" id="yOut">770</span></div></details>
 <button class="btn btn-blue wide" id="addCommand" style="margin-top:14px">＋ コマンドを追加</button>
-<p class="micro">角度は小数第3位まで入力できますが、画像から求まる実際の精度は解像度・線の状態に左右されます。</p>
+<p class="micro">画像からの精度は線の鮮明さによって変わります。</p>
 </div></section>
 </div>
 <div class="stack right">
-<section class="panel"><h2 class="panel-title">プレビュー（設定した角度の軌道）</h2><div class="preview-wrap"><canvas id="compassCanvas" width="400" height="350" aria-label="方向プレビュー"></canvas><div class="preview-stats"><div class="stat"><small>角度</small><b id="previewAngle">0.000°</b></div><div class="stat"><small>方向</small><p id="previewDirection">まっすぐ上（0°）</p></div><div class="stat"><small>なぞり距離</small><b id="previewDistance">600 pt</b></div></div></div><div class="infoBanner">✓ なぞり距離の変更に合わせて、矢印の長さがリアルタイムで変わります。</div></section>
+<section class="panel"><h2 class="panel-title">プレビュー（設定した角度の軌道）</h2><div class="preview-wrap"><canvas id="compassCanvas" width="400" height="350" aria-label="方向プレビュー"></canvas><div class="preview-stats"><div class="stat"><small>角度</small><b id="previewAngle">0.000°</b></div><div class="stat"><small>方向</small><p id="previewDirection">まっすぐ上（0°）</p></div><div class="stat"><small>なぞり距離</small><b id="previewDistance">600 pt</b></div></div></div><div class="infoBanner">✓ 距離に合わせてプレビューが変化します。</div></section>
 <section class="panel"><h2 class="panel-title">コマンド一覧（<span id="listCount">0</span>件）</h2><div id="commandList" class="list"><div class="empty-list">まだコマンドがありません。</div></div></section>
-<section class="green-section"><button class="btn btn-green wide" id="generate">↓ まとめて保存<br><span style="font-size:13px">（.voicecontrolcommands）</span></button><div class="exportSub"><label class="btn fileLabel" for="sourceFile">元の.voicecontrolcommandsを選択</label><input type="file" id="sourceFile" accept=".voicecontrolcommands,.plist,application/xml,text/xml"><span class="fileStatus" id="sourceName">元のファイル：未選択</span><div class="exportlog" id="exportStatus"></div></div></section>
+<section class="green-section"><div class="exportSub"><strong style="font-size:15px">① 元の音声コントロールファイルを読み込む</strong><span class="source-help">.voicecontrolcommands ファイルを選んでください。</span><input type="file" id="sourceFile" aria-label="元の.voicecontrolcommandsを選択"><span class="fileStatus" id="sourceName">元のファイル：未選択</span><div id="sourceReadStatus" role="status" aria-live="polite">読み込み待ち：まだファイルを選択していません。</div><strong style="font-size:15px;margin-top:10px">② コマンドを登録してまとめて保存</strong><button class="btn btn-green wide" id="generate">↓ まとめて保存<br><span style="font-size:13px">（.voicecontrolcommands）</span></button><div class="exportlog" id="exportStatus"></div></div></section>
 </div></div>
-<div class="explainer">ⓘ　検出方法：透明な線の色差・幅・直線としての連続性を評価し、線の左右ではなく<strong>中心</strong>を推定します。水平・斜め・縦方向のピンク系／黄色系の線に対応します。矢印の位置をタップすると、その近くを通る候補を優先します。背景や複数の線が重なる画像では誤検出する場合があります。生成する音声コマンドファイルのiPhoneへのインポートと動作は未検証です。</div>
+
 </main>
 <script>
 const TEMPLATE = {"$version":100000,"$archiver":"NSKeyedArchiver","$top":{"root":{"__uid":1}},"$objects":["$null",{"$class":{"__uid":138},"AllEvents":{"__uid":2},"Version":{"__uid":137},"ArePointsDeviceRelative":false},{"NS.objects":[{"__uid":3},{"__uid":17},{"__uid":24},{"__uid":30},{"__uid":36},{"__uid":42},{"__uid":48},{"__uid":54},{"__uid":60},{"__uid":66},{"__uid":72},{"__uid":78},{"__uid":84},{"__uid":90},{"__uid":96},{"__uid":102},{"__uid":108},{"__uid":114},{"__uid":120},{"__uid":126},{"__uid":132}],"$class":{"__uid":136}},{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":7},{"__uid":13},{"__uid":15}],"$class":{"__uid":16}},"Fingers","Forces","Time",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":9}],"$class":{"__uid":12}},1,{"NS.pointval":{"__uid":10},"$class":{"__uid":11},"NS.special":1},"{175.66666666666666, 427}",{"$classname":"NSValue","$classes":["NSValue","NSObject"]},{"$classname":"NSMutableDictionary","$classes":["NSMutableDictionary","NSDictionary","NSObject"]},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":14}],"$class":{"__uid":12}},0.0,812959975.812581,{"$classname":"NSDictionary","$classes":["NSDictionary","NSObject"]},{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":18},{"__uid":21},{"__uid":23}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":19}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":20},"$class":{"__uid":11},"NS.special":1},"{175.66666666666666, 427}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},1.0,812959975.813017,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":25},{"__uid":28},{"__uid":29}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":26}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":27},"$class":{"__uid":11},"NS.special":1},"{168, 436.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.863868,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":31},{"__uid":34},{"__uid":35}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":32}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":33},"$class":{"__uid":11},"NS.special":1},"{165, 440.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.876084,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":37},{"__uid":40},{"__uid":41}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":38}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":39},"$class":{"__uid":11},"NS.special":1},"{161, 444.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.893067,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":43},{"__uid":46},{"__uid":47}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":44}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":45},"$class":{"__uid":11},"NS.special":1},"{157.66666666666666, 449}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.909464,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":49},{"__uid":52},{"__uid":53}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":50}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":51},"$class":{"__uid":11},"NS.special":1},"{154, 453}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.926036,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":55},{"__uid":58},{"__uid":59}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":56}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":57},"$class":{"__uid":11},"NS.special":1},"{150.33333333333331, 457.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.942622,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":61},{"__uid":64},{"__uid":65}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":62}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":63},"$class":{"__uid":11},"NS.special":1},"{146.66666666666666, 461.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.979808,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":67},{"__uid":70},{"__uid":71}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":68}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":69},"$class":{"__uid":11},"NS.special":1},"{143.33333333333331, 465.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.997102,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":73},{"__uid":76},{"__uid":77}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":74}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":75},"$class":{"__uid":11},"NS.special":1},"{139.33333333333331, 470}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.013734,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":79},{"__uid":82},{"__uid":83}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":80}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":81},"$class":{"__uid":11},"NS.special":1},"{135.66666666666666, 475}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.030376,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":85},{"__uid":88},{"__uid":89}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":86}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":87},"$class":{"__uid":11},"NS.special":1},"{131.66666666666666, 479.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.042667,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":91},{"__uid":94},{"__uid":95}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":92}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":93},"$class":{"__uid":11},"NS.special":1},"{128.33333333333331, 483.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.059288,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":97},{"__uid":100},{"__uid":101}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":98}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":99},"$class":{"__uid":11},"NS.special":1},"{125.33333333333333, 487}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.075917,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":103},{"__uid":106},{"__uid":107}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":104}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":105},"$class":{"__uid":11},"NS.special":1},"{122.66666666666666, 489.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.092614,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":109},{"__uid":112},{"__uid":113}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":110}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":111},"$class":{"__uid":11},"NS.special":1},"{120.66666666666666, 491.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.109201,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":115},{"__uid":118},{"__uid":119}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":116}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":117},"$class":{"__uid":11},"NS.special":1},"{120, 492.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.145799,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":121},{"__uid":124},{"__uid":125}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":122}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":123},"$class":{"__uid":11},"NS.special":1},"{119.66666666666666, 492.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.163673,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":127},{"__uid":130},{"__uid":131}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":128}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":129},"$class":{"__uid":11},"NS.special":1},"{119.66666666666666, 492.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.292552,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":133},{"__uid":134},{"__uid":135}],"$class":{"__uid":16}},{"NS.keys":[],"NS.objects":[],"$class":{"__uid":12}},{"NS.keys":[],"NS.objects":[],"$class":{"__uid":12}},812959976.292835,{"$classname":"NSMutableArray","$classes":["NSMutableArray","NSArray","NSObject"]},1,{"$classname":"AXMutableReplayableGesture","$classes":["AXMutableReplayableGesture","AXReplayableGesture","NSObject"]}]};
@@ -237,27 +244,37 @@ function updateCandidateButtons(){const root=$('candidateBtns');root.replaceChil
 // 360°対応の直線検出。横方向だけでなく、斜め方向もハフ変換で評価する。
 // Color difference + local contrast detects thin tinted trajectory ridges without requiring external libraries.
 function buildLineEvidence(image){
- const ratio=Math.min(1,440/image.naturalWidth,1020/image.naturalHeight), W=Math.max(24,Math.round(image.naturalWidth*ratio)),H=Math.max(24,Math.round(image.naturalHeight*ratio));
- const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d',{willReadFrequently:true});c.drawImage(image,0,0,W,H);
- const src=c.getImageData(0,0,W,H).data, pink=new Float32Array(W*H),yellow=new Float32Array(W*H);
- const maskRed=new Uint8Array(W*H),maskBlue=new Uint8Array(W*H),sumRed=new Float32Array((W+1)*(H+1)),sumBlue=new Float32Array((W+1)*(H+1));
- for(let y=0;y<H;y++){
-  const rRow=new Float32Array(W+1),yRow=new Float32Array(W+1);
-  for(let x=0;x<W;x++){
-   const i=(y*W+x)*4,r=src[i],g=src[i+1],b=src[i+2];
-   rRow[x+1]=rRow[x]+(r-g);yRow[x+1]=yRow[x]+(g-b);
-   const idx=y*W+x;maskRed[idx]=r>145&&r>g*1.28&&r>b*1.25&&g<190?1:0;
-   maskBlue[idx]=b>125&&b>r*1.3&&b>g*1.12&&r<160?1:0;
-  }
-  for(let x=0;x<W;x++){
-   const a=Math.max(0,x-2),b=Math.min(W,x+3),l=Math.max(0,x-15),h=Math.min(W,x+16),idx=y*W+x;
-   // foreground narrow ridge minus wide local backdrop
-   pink[idx]=Math.max(0,(rRow[b]-rRow[a])/(b-a)-(rRow[h]-rRow[l])/(h-l));
-   yellow[idx]=Math.max(0,(yRow[b]-yRow[a])/(b-a)-(yRow[h]-yRow[l])/(h-l));
-   const off=(y+1)*(W+1)+x+1,up=y*(W+1)+x+1;
-   sumRed[off]=sumRed[up]+sumRed[off-1]-sumRed[up-1]+maskRed[idx];
-   sumBlue[off]=sumBlue[up]+sumBlue[off-1]-sumBlue[up-1]+maskBlue[idx];
-  }
+ // The line can be diagonal or almost horizontal. Compare each colored pixel to
+ // its 2-D neighbourhood, instead of measuring only left/right contrast.
+ const ratio=Math.min(1,480/image.naturalWidth,1060/image.naturalHeight),W=Math.max(24,Math.round(image.naturalWidth*ratio)),H=Math.max(24,Math.round(image.naturalHeight*ratio));
+ const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+ const c=cv.getContext('2d',{willReadFrequently:true});c.drawImage(image,0,0,W,H);
+ const src=c.getImageData(0,0,W,H).data,N=W*H;
+ const pink=new Float32Array(N),yellow=new Float32Array(N);
+ const red=new Float32Array(N),ylw=new Float32Array(N);
+ const maskRed=new Uint8Array(N),maskBlue=new Uint8Array(N),sumRed=new Float32Array((W+1)*(H+1)),sumBlue=new Float32Array((W+1)*(H+1));
+ const ip=new Float64Array((W+1)*(H+1)),iy=new Float64Array((W+1)*(H+1));
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+  const i=(y*W+x)*4,k=y*W+x,r=src[i],g=src[i+1],b=src[i+2];
+  // A translucent pink/yellow line shows small positive chroma atop any background.
+  red[k]=r-(g*.56+b*.44);ylw[k]=(.62*r+.38*g)-b;
+  maskRed[k]=r>145&&r>g*1.28&&r>b*1.25&&g<190?1:0;
+  maskBlue[k]=b>125&&b>r*1.3&&b>g*1.12&&r<160?1:0;
+  const a=(y+1)*(W+1)+x+1,up=y*(W+1)+x+1;
+  ip[a]=ip[up]+ip[a-1]-ip[up-1]+red[k];iy[a]=iy[up]+iy[a-1]-iy[up-1]+ylw[k];
+  sumRed[a]=sumRed[up]+sumRed[a-1]-sumRed[up-1]+maskRed[k];sumBlue[a]=sumBlue[up]+sumBlue[a-1]-sumBlue[up-1]+maskBlue[k];
+ }
+ function region(integral,x0,y0,x1,y1){x0=Math.max(0,x0);y0=Math.max(0,y0);x1=Math.min(W,x1);y1=Math.min(H,y1);const s=W+1;return (integral[y1*s+x1]-integral[y0*s+x1]-integral[y1*s+x0]+integral[y0*s+x0])/Math.max(1,(x1-x0)*(y1-y0))}
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+  const k=y*W+x;
+  // Local difference against a wide patch detects the translucent trail;
+  // contrast against a small patch suppresses wide arrow bodies/obstacles.
+  const innerR=region(ip,x-2,y-2,x+3,y+3),outerR=region(ip,x-15,y-15,x+16,y+16);
+  const innerY=region(iy,x-2,y-2,x+3,y+3),outerY=region(iy,x-15,y-15,x+16,y+16);
+  const narrowR=red[k]-outerR,narrowY=ylw[k]-outerY;
+  const nr=Math.max(0,innerR-outerR),ny=Math.max(0,innerY-outerY);
+  pink[k]=Math.max(0,narrowR*.35+nr*.65);
+  yellow[k]=Math.max(0,narrowY*.35+ny*.65);
  }
  return {W,H,maps:{pink,yellow},sumRed,sumBlue};
 }
@@ -272,7 +289,7 @@ function lineCandidates(analysis,color){
  for(let k=0;k<thetaCount;k++){const t=k*thetaStep*Math.PI/180;cs[k]=Math.cos(t);sn[k]=Math.sin(t)}
  const acc=new Uint32Array(thetaCount*rhoBins);let points=0;
  for(let y=Math.round(H*.045);y<Math.round(H*.91);y+=2){for(let x=Math.round(W*.035);x<Math.round(W*.965);x+=2){
-  const v=map[y*W+x];if(v<11)continue; // thin coloured line evidence
+  const v=map[y*W+x];if(v<9.5)continue; // translucent thin line evidence
   // unweighted votes prefer continuity to broad bright blocks
   const xx=x-W/2,yy=y-H/2,wt=v>21?2:1;points++;
   for(let k=0;k<thetaCount;k++){
@@ -283,7 +300,7 @@ function lineCandidates(analysis,color){
  const maxima=[];
  for(let k=0;k<thetaCount;k++){
   for(let r=3;r<rhoBins-3;r++){
-   const v=acc[k*rhoBins+r];if(v<29)continue;
+   const v=acc[k*rhoBins+r];if(v<24)continue;
    if(v<acc[k*rhoBins+r-1]||v<acc[k*rhoBins+r+1])continue;
    // Bias toward oblique trajectories only for equally-supported background lines.
    const angle=Math.abs(((k*thetaStep+90)%180)-90),penalty=.9+.1*Math.sin(angle*Math.PI/180);
@@ -315,7 +332,7 @@ function refineLine(analysis,c){
    const x=Math.round(px+q*nx),y=Math.round(py+q*ny),v=map[y*W+x];
    if(v>peak){peak=v;peakQ=q}
   }
-  if(peak<10.5)continue;
+  if(peak<9.0)continue;
   let sw=0,sq=0;
   for(let q=Math.max(-10,peakQ-3);q<=Math.min(10,peakQ+3);q++){
    const x=Math.round(px+q*nx),y=Math.round(py+q*ny),v=map[y*W+x],w=Math.max(0,v-peak*.45-2);
@@ -359,21 +376,21 @@ function rankLine(l,analysis){
  let score=l.baseScore;
  // Background borders and HUD bars are frequently stronger than translucent aiming lines.
  const centerDist=Math.abs(l.centerX-W*.5)/(W*.5),edge=(Math.min(l.centerX,W-l.centerX));
- if(edge<W*.14 && Math.abs(Math.sin(l.angle*Math.PI/180))<.30)score*=.20;else if(edge<W*.065)score*=.48;
- if(Math.abs(b.y-a.y)<H*.055)score*=.25;
+ if(edge<W*.14 && Math.abs(Math.sin(l.angle*Math.PI/180))<.30)score*=.12;else if(edge<W*.065)score*=.30;
+ if(Math.abs(b.y-a.y)<H*.035)score*=.18;
  score*=1-.28*Math.min(1,centerDist);
- if(source==='red'){score*=l.color==='pink'?1.65:.55}
- if(source==='blue'){score*=l.color==='yellow'?1.65:.55}
+ if(source==='red'){score*=l.color==='pink'?2.4:.30}
+ if(source==='blue'){score*=l.color==='yellow'?2.4:.30}
  if(source==='auto'){score*=l.color==='pink'?1.08:1}
  if(state.arrowAnchor){
   const x=state.arrowAnchor.x*W/state.arrowAnchor.w,y=state.arrowAnchor.y*H/state.arrowAnchor.h;
   const dist=distanceToSegment(x,y,a,b),near=Math.min(Math.hypot(x-a.x,y-a.y),Math.hypot(x-b.x,y-b.y));
-  score*=Math.exp(-dist/Math.max(16,W*.105))*(.7+.3*Math.exp(-near/Math.max(25,W*.3)));
+  score*=Math.exp(-dist/Math.max(9,W*.055))*(.55+.45*Math.exp(-near/Math.max(20,W*.2)));
  }else{
   const use=source==='blue'?sumBlue:sumRed;
   const endColor=(p)=>rectangleCount(use,W,H,p.x-37,p.y-37,p.x+37,p.y+37);
   const colorScore=Math.max(endColor(a),endColor(b));
-  score*=1+.32*Math.min(1,colorScore/180);
+  score*=1+.75*Math.min(1,colorScore/130);
  }
  return score;
 }
@@ -431,20 +448,139 @@ function readCommand(){const name=$('name').value.trim();if(!name)throw Error('�
 function renderCommands(){for(const id of ['commandList','commandListLeft']){$(id).replaceChildren();if(!state.commands.length){const e=document.createElement('div');e.className='empty-list';e.textContent='まだコマンドがありません。';$(id).append(e)}for(let i=0;i<state.commands.length;i++){
  const item=state.commands[i],entry=document.createElement('div'),info=document.createElement('div'),title=document.createElement('b'),details=document.createElement('p'),actions=document.createElement('div'),edit=document.createElement('button'),del=document.createElement('button');entry.className='item';info.className='contents';title.textContent='▶ '+item.name;details.textContent='角度: '+formatAngle(normalizeAngle(item.angle+(item.direction==='reverse'?180:0)))+'　距離: '+Math.round(Math.hypot(item.s.ex-item.s.x,item.s.ey-item.s.y))+'pt　タッチ: '+item.s.dur+'ms　待機: '+item.s.wait+'ms';info.append(title,details);actions.className='itemactions';edit.className=del.className='iconBtn';edit.textContent='編集';del.textContent='削除';edit.addEventListener('click',()=>{$('name').value=item.name;setAngle(item.angle);$('direction').value=item.direction;for(const [id,v] of [['distance',Math.round(Math.hypot(item.s.ex-item.s.x,item.s.ey-item.s.y))],['duration',item.s.dur],['delay',item.s.wait],['x',item.s.x],['y',item.s.y]]){$(id+'Range').value=v;$(id+'Range').dispatchEvent(new Event('input'))}setAngle(item.angle);state.commands.splice(i,1);renderCommands();setMode('manual')});del.addEventListener('click',()=>{state.commands.splice(i,1);renderCommands()});actions.append(edit,del);entry.append(info,actions);$(id).append(entry)}}$('listCount').textContent=state.commands.length}
 $('addCommand').addEventListener('click',()=>{try{const item=readCommand();state.commands.push(item);renderCommands();$('exportStatus').textContent='「'+item.name+'」を追加しました。'}catch(e){$('exportStatus').textContent='エラー: '+e.message}});
-$('sourceFile').addEventListener('change',()=>{$('sourceName').textContent='元のファイル：'+($('sourceFile').files[0]?.name||'未選択')});
+// The iPhone Files picker may hide custom extensions when accept= is specified.
+// Selection is unrestricted. XML plist and binary plist can both be imported.
+let importedSource=null;
+function readBinaryPlist(buf){
+ const bytes=new Uint8Array(buf), dv=new DataView(buf);
+ if(String.fromCharCode(...bytes.subarray(0,8))!=='bplist00')throw Error('バイナリplistのヘッダーが不正です。');
+ const n=bytes.length;if(n<40)throw Error('ファイルが短すぎます。');
+ const os=bytes[n-26],rs=bytes[n-25];
+ function uint(pos,len){if(len<1||len>8||pos<0||pos+len>n)throw Error('plistの長さ情報が不正です。');let v=0;for(let i=0;i<len;i++)v=v*256+bytes[pos+i];if(!Number.isSafeInteger(v))throw Error('plistの整数が大きすぎます。');return v}
+ const count=uint(n-24,8),top=uint(n-16,8),off=uint(n-8,8);
+ if(count<1||count>200000||top>=count||off>=n-32||!os||!rs)throw Error('plistの管理情報が不正です。');
+ const offsets=Array.from({length:count},(_,i)=>uint(off+i*os,os));
+ const cache=new Map();
+ const ascii=(p,s)=>{if(p+s>n)throw Error('文字列が途切れています。');return new TextDecoder('utf-8').decode(bytes.subarray(p,p+s))};
+ function parse(id,depth=0){
+  if(depth>100||id>=count)throw Error('plistの入れ子構造が不正です。');
+  if(cache.has(id))return cache.get(id);
+  let p=offsets[id],type=bytes[p]>>4,lo=bytes[p]&15; if(p>=off)throw Error('plistオブジェクトの位置が不正です。');
+  const size=()=>{if(lo!==15)return [lo,p+1];let h=bytes[p+1],k=1<<(h&15);if((h>>4)!==1)throw Error('plistのサイズ表記が不正です。');return [uint(p+2,k),p+2+k]};
+  let v;
+  if(type===0){v=lo===8?false:lo===9?true:null}
+  else if(type===1){const k=1<<lo;v=uint(p+1,k)}
+  else if(type===2){const k=1<<lo;v=k===4?dv.getFloat32(p+1,false):k===8?dv.getFloat64(p+1,false):NaN;if(!Number.isFinite(v))throw Error('plistの実数が不正です。')}
+  else if(type===3){if(lo!==3)throw Error('plistの日時形式が不正です。');v=new Date(978307200000+dv.getFloat64(p+1,false)*1000)}
+  else if(type===4){const [l,s]=size();v=bytes.slice(s,s+l)}
+  else if(type===5||type===6){const [l,s]=size();if(type===5)v=ascii(s,l);else{const units=[];for(let j=0;j<l;j++)units.push(uint(s+j*2,2));v='';for(let j=0;j<units.length;j+=8000)v+=String.fromCharCode(...units.slice(j,j+8000))}}
+  else if(type===8){v=uint(p+1,lo+1)}
+  else if(type===10||type===12){const [l,s]=size();if(l>500000)throw Error('配列が長すぎます。');v=[];cache.set(id,v);for(let j=0;j<l;j++)v.push(parse(uint(s+j*rs,rs),depth+1));return v}
+  else if(type===13){const [l,s]=size();if(l>500000)throw Error('辞書が大きすぎます。');v=Object.create(null);cache.set(id,v);for(let j=0;j<l;j++){const key=parse(uint(s+j*rs,rs),depth+1),value=parse(uint(s+(l+j)*rs,rs),depth+1);v[String(key)]=value}return v}
+  else throw Error('このバイナリplistのデータ型 '+type+' に対応していません。');
+  cache.set(id,v);return v;
+ }
+ return parse(top);
+}
+function plistXmlFromObject(v){
+ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+ function node(x){if(x===null)return '<string></string>';
+  if(x===true)return '<true/>';if(x===false)return '<false/>';
+  if(x instanceof Date)return '<date>'+x.toISOString().replace(/\.\d{3}Z$/,'Z')+'</date>';
+  if(x instanceof Uint8Array)return '<data>'+encode64(x)+'</data>';
+  if(typeof x==='number')return (Number.isInteger(x)?'<integer>':'<real>')+x+(Number.isInteger(x)?'</integer>':'</real>');
+  if(typeof x==='string')return '<string>'+esc(x)+'</string>';
+  if(Array.isArray(x))return '<array>'+x.map(node).join('')+'</array>';
+  if(x&&typeof x==='object')return '<dict>'+Object.keys(x).map(k=>'<key>'+esc(k)+'</key>'+node(x[k])).join('')+'</dict>';
+  throw Error('未対応のplistデータ型です。')}
+ return '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">'+node(v)+'</plist>';
+}
+function inspectSource(doc){
+ if(doc.querySelector('parsererror')||doc.documentElement?.tagName!=='plist')throw Error('plist形式として解析できません。別のファイルを選んでください。');
+ const root=[...doc.documentElement.children].find(x=>x.tagName==='dict');
+ if(!root)throw Error('plistのルート辞書がありません。');
+ const table=childVal(root,'CommandsTable');
+ if(!table||table.tagName!=='dict')throw Error('「CommandsTable」がありません。音声コントロールから書き出したファイルか確認してください。');
+ let template=null,total=0;
+ for(let i=0;i<table.children.length-1;i++){
+  const key=table.children[i],v=table.children[i+1];
+  if(key.tagName!=='key'||v.tagName!=='dict')continue;
+  total++;
+  const c=childVal(v,'CustomCommands'),gesture=childVal(v,'CustomGesture');
+  if(c&&gesture&&gesture.tagName==='data'&&childVal(c,'ja_JP')?.tagName==='array')template=v;
+  i++;
+ }
+ return {total,hasTemplate:!!template};
+}
+async function openSourceFile(file){
+ if(!file)throw Error('ファイルが選択されていません。');
+ const buffer=await file.arrayBuffer(),bytes=new Uint8Array(buffer);
+ if(!bytes.length)throw Error('ファイルが空です。');
+ let content,kind;
+ if(bytes.length>=8&&String.fromCharCode(...bytes.subarray(0,8))==='bplist00'){
+  content=plistXmlFromObject(readBinaryPlist(buffer));kind='バイナリplist';
+ }else{
+  content=new TextDecoder('utf-8').decode(bytes);
+  if(content.charCodeAt(0)===0xfeff)content=content.slice(1);
+  if(/^\s*<\?xml|^\s*<plist|^\s*<!DOCTYPE plist/i.test(content))kind='XML plist';
+  else throw Error('XML plistでもバイナリplistでもありません。');
+ }
+ const doc=new DOMParser().parseFromString(content,'application/xml');
+ const info=inspectSource(doc);
+ return {content,kind,info,fileName:file.name};
+}
+function showSourceMessage(message,status=''){
+ const el=$('sourceReadStatus');el.classList.remove('ok','err');if(status)el.classList.add(status);el.textContent=message;
+}
+$('sourceFile').addEventListener('change',async()=>{
+ importedSource=null;
+ const file=$('sourceFile').files[0];
+ $('sourceName').textContent='元のファイル：'+(file?.name||'未選択');
+ if(!file){showSourceMessage('読み込み待ち：ファイルを選択してください。');return}
+ showSourceMessage('読み込み中：'+file.name+' ...');
+ try{
+  const imported=await openSourceFile(file);
+  if($('sourceFile').files[0]!==file)return;
+  importedSource=imported;
+  const s=imported.info;
+  if(s.hasTemplate)showSourceMessage('✓ 読み込み成功！\n'+imported.kind+' / 既存コマンド：'+s.total+'件\nコマンドを追加して「まとめて保存」を押してください。','ok');
+  else showSourceMessage('ファイルは読み込めましたが、複製可能なカスタムジェスチャーがありません。\n元のファイルにカスタムジェスチャーを1件以上登録してから、もう一度書き出してください。','err');
+ }catch(e){showSourceMessage('読み込みエラー：'+e.message+'\n※「ファイル」アプリに保存した音声コントロールの書き出しファイルを選択してください。','err')}
+});
 $('generate').addEventListener('click',async()=>{try{
- const file=$('sourceFile').files[0];if(!file)throw Error('元の.voicecontrolcommandsファイルを選択してください。');if(!state.commands.length)throw Error('先に「＋ コマンドを追加」を押してください。');
- const data=await file.text(),doc=new DOMParser().parseFromString(data,'application/xml');if(doc.querySelector('parsererror'))throw Error('元ファイルがXML形式ではありません。');
- const root=doc.documentElement.querySelector('dict'),table=childVal(root,'CommandsTable');if(!table||table.tagName!=='dict')throw Error('CommandsTableを読み取れません。');
- const children=[...table.children],keys=new Set();let original=null,originalCount=0;for(let i=0;i<children.length-1;i++){if(children[i].tagName==='key'&&children[i+1].tagName==='dict'){keys.add(children[i].textContent);const body=children[i+1];const names=childVal(body,'CustomCommands'),gest=childVal(body,'CustomGesture');if(names&&gest)original=body;originalCount++;i++}}
- if(!original)throw Error('既存ファイルにカスタムジェスチャーのひな形がありません。');
- for(const item of state.commands){const copy=original.cloneNode(true),names=childVal(copy,'CustomCommands'),locale=childVal(names,'ja_JP');if(!locale||locale.tagName!=='array')throw Error('ja_JPの音声コマンドを読み取れません');locale.replaceChildren();const word=doc.createElement('string');word.textContent=item.name;locale.appendChild(word);
- const gest=childVal(copy,'CustomGesture');if(!gest||gest.tagName!=='data')throw Error('CustomGestureを読み取れません');gest.textContent='\n'+encode64(gesture(item.s)).replace(/.{1,68}/g,'$&\n');
- let key;do{key='Custom.'+Date.now()+'.'+Math.floor(Math.random()*1e12)}while(keys.has(key));keys.add(key);const element=doc.createElement('key');element.textContent=key;table.append(element,copy)}
+ const file=$('sourceFile').files[0];if(!file)throw Error('先に元の.voicecontrolcommandsファイルを選択してください。');
+ if(!state.commands.length)throw Error('先に「＋ コマンドを追加」を押してください。');
+ const imported=importedSource&&importedSource.fileName===file.name?importedSource:await openSourceFile(file);
+ if(!imported.info.hasTemplate)throw Error('元ファイルにカスタムジェスチャーのひな形がありません。');
+ // Clone a fresh DOM each time to avoid duplicating commands on repeated exports.
+ const doc=new DOMParser().parseFromString(imported.content,'application/xml');
+ const root=[...doc.documentElement.children].find(x=>x.tagName==='dict'),table=childVal(root,'CommandsTable');
+ const children=[...table.children],keys=new Set();let original=null,originalCount=0;
+ for(let i=0;i<children.length-1;i++){
+  if(children[i].tagName==='key'&&children[i+1].tagName==='dict'){
+   keys.add(children[i].textContent);const body=children[i+1];
+   const names=childVal(body,'CustomCommands'),gest=childVal(body,'CustomGesture');
+   if(names&&gest&&gest.tagName==='data'&&childVal(names,'ja_JP')?.tagName==='array')original=body;
+   originalCount++;i++;
+  }
+ }
+ if(!original)throw Error('既存ファイルにカスタムジェスチャーがありません。');
+ for(const item of state.commands){
+  const copy=original.cloneNode(true),names=childVal(copy,'CustomCommands'),locale=childVal(names,'ja_JP');
+  locale.replaceChildren();const word=doc.createElement('string');word.textContent=item.name;locale.appendChild(word);
+  const gest=childVal(copy,'CustomGesture');gest.textContent='\n'+encode64(gesture(item.s)).replace(/.{1,68}/g,'$&\n');
+  let key;do{key='Custom.'+Date.now()+'.'+Math.floor(Math.random()*1e12)}while(keys.has(key));
+  keys.add(key);const element=doc.createElement('key');element.textContent=key;table.append(element,copy);
+ }
  const xml='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'+new XMLSerializer().serializeToString(doc.documentElement)+'\n';
- const blob=new Blob([xml],{type:'application/octet-stream'});if(state.lastUrl)URL.revokeObjectURL(state.lastUrl);state.lastUrl=URL.createObjectURL(blob);
- const name='ジェスチャー_'+state.commands.length+'件.voicecontrolcommands';const a=document.createElement('a');a.href=state.lastUrl;a.download=name;a.className='downloadLink';a.textContent='作成したファイルをダウンロード';$('exportStatus').replaceChildren(document.createTextNode('ファイルを生成しました。\n既存：'+originalCount+'件、追加：'+state.commands.length+'件\n'),a);a.click();
- }catch(err){$('exportStatus').textContent='エラー：'+err.message;console.error(err)}});
+ const blob=new Blob([xml],{type:'application/octet-stream'});
+ if(state.lastUrl)URL.revokeObjectURL(state.lastUrl);state.lastUrl=URL.createObjectURL(blob);
+ const name='ジェスチャー_'+state.commands.length+'件.voicecontrolcommands';
+ const a=document.createElement('a');a.href=state.lastUrl;a.download=name;a.className='downloadLink';a.textContent='作成したファイルをダウンロード';
+ $('exportStatus').replaceChildren(document.createTextNode('ファイルを生成しました。\n既存：'+originalCount+'件、追加：'+state.commands.length+'件\n'),a);
+ a.click();
+ }catch(err){$('exportStatus').textContent='エラー：'+err.message;console.error(err)}
+});
 // First load: deliberately show no image.
 renderCommands();setAngle(0);showPhoto();drawCompass();drawManual();
 </script></body></html>

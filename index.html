@@ -76,13 +76,13 @@ input[type=range]{width:100%;accent-color:#168cf9;min-width:0;cursor:pointer;hei
 <label class="fieldlabel" for="name">音声コマンド名</label><input class="input" id="name" value="ゲージショット1" type="text" maxlength="100">
 <div class="angleLine"><label class="fieldlabel" for="angleNumber">角度（°）</label><div class="angle-edit"><button class="btn tiny" id="minusAngle">−</button><input class="input" id="angleNumber" type="number" inputmode="decimal" min="0" max="360" step="0.001" value="0.000"><button class="btn tiny" id="plusAngle">＋</button></div></div>
 <div class="angleLine"><label class="subtle" for="angleStep">微調整幅</label><select id="angleStep"><option value="1">1°</option><option value="0.1">0.1°</option><option value="0.01">0.01°</option><option value="0.001" selected>0.001°</option></select></div>
-<div class="control"><label for="distanceRange">なぞり距離</label><input id="distanceRange" type="range" min="10" max="1000" step="1" value="600"><span class="value" id="distanceOut">600 pt</span></div>
+<div class="control"><label for="distanceRange">なぞり距離</label><input id="distanceRange" type="range" min="10" max="700" step="1" value="600"><span class="value" id="distanceOut">600 pt</span></div>
 <div class="control"><label for="durationRange">タッチ継続時間</label><input id="durationRange" type="range" min="50" max="3000" step="10" value="500"><span class="value" id="durationOut">500 ms</span></div>
 <div class="control"><label for="delayRange">開始までの待ち時間</label><input id="delayRange" type="range" min="0" max="3000" step="10" value="200"><span class="value" id="delayOut">200 ms</span></div>
 <div class="angleLine"><label class="fieldlabel" for="direction">なぞる方向</label><select id="direction"><option value="forward">指定した角度</option><option value="reverse">反対向き（180°反転）</option></select></div>
 <details><summary class="subtle" style="cursor:pointer;margin-top:8px">開始座標の詳細設定</summary>
-<div class="control"><label for="xRange">開始 X</label><input id="xRange" type="range" min="0" max="430" value="195"><span class="value" id="xOut">195</span></div>
-<div class="control"><label for="yRange">開始 Y</label><input id="yRange" type="range" min="0" max="1050" value="770"><span class="value" id="yOut">770</span></div></details>
+<div class="control"><label for="xRange">開始 X</label><input id="xRange" type="range" min="0" max="430" value="215"><span class="value" id="xOut">215</span></div>
+<div class="control"><label for="yRange">開始 Y</label><input id="yRange" type="range" min="0" max="1050" value="525"><span class="value" id="yOut">525</span></div></details>
 <button class="btn btn-blue wide" id="addCommand" style="margin-top:14px">＋ コマンドを追加</button>
 <p class="micro">画像からの精度は線の鮮明さによって変わります。</p>
 </div></section>
@@ -177,8 +177,15 @@ function drawVector(canvas){
  ctx.strokeStyle='#2d4057';ctx.lineWidth=1;
  for(let x=20;x<w;x+=30){ctx.beginPath();ctx.moveTo(x,15);ctx.lineTo(x,h-15);ctx.stroke()}
  for(let y=20;y<h;y+=30){ctx.beginPath();ctx.moveTo(15,y);ctx.lineTo(w-15,y);ctx.stroke()}
- const ox=w*.5,oy=h*.54,r=currentAngle()*Math.PI/180,dx=Math.sin(r),dy=-Math.cos(r);
- const margin=21;
+ // Map the selected device start coordinates to the preview viewport.
+ // x/y ranges represent the device-space extents. Midpoints map to the canvas center.
+ const xSlider=$('xRange'),ySlider=$('yRange');
+ const xFraction=(Number(xSlider.value)-Number(xSlider.min))/(Number(xSlider.max)-Number(xSlider.min));
+ const yFraction=(Number(ySlider.value)-Number(ySlider.min))/(Number(ySlider.max)-Number(ySlider.min));
+ const margin=26;
+ const ox=margin+Math.max(0,Math.min(1,xFraction))*(w-2*margin);
+ const oy=margin+Math.max(0,Math.min(1,yFraction))*(h-2*margin);
+ const r=currentAngle()*Math.PI/180,dx=Math.sin(r),dy=-Math.cos(r);
  function reach(vx,vy){
   const ts=[];
   if(vx>1e-8)ts.push((w-margin-ox)/vx);
@@ -190,15 +197,18 @@ function drawVector(canvas){
  const slider=$('distanceRange');
  const dist=Number(slider.value),min=Number(slider.min),max=Number(slider.max);
  const t=Math.max(0,Math.min(1,(dist-min)/(max-min)));
- // 4% at the shortest distance, 100% at the maximum distance.
- // This keeps the shortest stroke visible without changing its direction.
- const visibleLength=reach(dx,dy)*(.04+.96*t);
+ // 26% at the shortest distance, 100% at the maximum distance.
+ // The preview exaggerates short strokes for legibility; the exported distance is unchanged.
+ // Short distances remain legible. For starts near an edge, allow the vector
+ // to reach the edge but do not reverse or recenter its true starting position.
+ const available=Math.max(0,reach(dx,dy));
+ const visibleLength=available*(.26+.74*t);
  const ex=ox+dx*visibleLength,ey=oy+dy*visibleLength;
  // Compass arc and labels remain fixed while the arrow changes length.
  ctx.strokeStyle='#b6c1d1';ctx.lineWidth=1;
- ctx.beginPath();ctx.arc(ox,oy,Math.min(w,h)*.34,Math.PI,0);ctx.stroke();
+ ctx.beginPath();ctx.arc(w*.5,h*.5,Math.min(w,h)*.34,Math.PI,0);ctx.stroke();
  ctx.fillStyle='#e5edf8';ctx.font='13px -apple-system, sans-serif';ctx.textAlign='center';
- ctx.fillText('0°',ox,19);ctx.fillText('−90°',26,oy-8);ctx.fillText('+90°',w-27,oy-8);
+ ctx.fillText('0°',w*.5,19);ctx.fillText('−90°',26,h*.5-8);ctx.fillText('+90°',w-27,h*.5-8);
  ctx.lineCap='round';
  ctx.strokeStyle='#043e56';ctx.lineWidth=10;
  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ex,ey);ctx.stroke();

@@ -104,7 +104,7 @@ body[data-page="existing"] #existingEditorPanel{grid-row:2}
 <div class="angleLine"><label class="fieldlabel" for="angleNumber">角度（°）</label><div class="angle-edit"><button class="btn tiny" id="minusAngle">−</button><input class="input" id="angleNumber" type="number" inputmode="decimal" min="0" max="360" step="0.001" value="0.000"><button class="btn tiny" id="plusAngle">＋</button></div></div>
 <div class="angleLine"><label class="subtle" for="angleStep">微調整幅</label><select id="angleStep"><option value="1">1°</option><option value="0.1">0.1°</option><option value="0.01">0.01°</option><option value="0.001" selected>0.001°</option></select></div>
 <div class="control"><label for="distanceRange">なぞり距離</label><input id="distanceRange" type="range" min="10" max="700" step="1" value="600"><span class="value visually-hidden" id="distanceOut"></span><input class="input small-number" id="distanceDirect" type="number" min="10" max="700" step="1" value="600" inputmode="numeric" aria-label="なぞり距離の数値入力"></div>
-<div class="control"><label for="durationRange">タッチ継続時間</label><input id="durationRange" type="range" min="50" max="500" step="1" value="500"><span class="value visually-hidden" id="durationOut"></span><input class="input small-number" id="durationDirect" type="number" min="50" max="500" step="1" value="500" inputmode="numeric" aria-label="タッチ時間の数値入力"></div>
+<div class="control"><label for="durationRange">タッチ継続時間</label><input id="durationRange" type="range" min="50" max="5000" step="1" value="500"><span class="value visually-hidden" id="durationOut"></span><input class="input small-number" id="durationDirect" type="number" min="50" max="5000" step="1" value="500" inputmode="numeric" aria-label="タッチ時間の数値入力"></div>
 <div class="control"><label for="delayRange">開始までの待ち時間</label><input id="delayRange" type="range" min="0" max="500" step="10" value="200"><span class="value" id="delayOut">200 ms</span></div>
 <div class="angleLine"><label class="fieldlabel" for="direction">なぞる方向</label><select id="direction"><option value="forward">指定した角度</option><option value="reverse">反対向き（180°反転）</option></select></div>
 <details><summary class="subtle" style="cursor:pointer;margin-top:8px">開始座標の詳細設定</summary>
@@ -127,8 +127,8 @@ body[data-page="existing"] #existingEditorPanel{grid-row:2}
 <div class="curve-preview"><canvas id="pathCanvas" width="430" height="1050" aria-label="元のジェスチャー軌跡（編集不可）"></canvas>
 <div class="curve-inputs">
 <label class="fieldlabel" for="curveDurationNumber">タッチ時間（ms）</label>
-<div class="numeric-row"><input id="curveDurationNumber" class="input" type="number" inputmode="numeric" min="50" max="500" step="1" value="500"><span>ms</span></div>
-<input id="curveDuration" type="range" min="50" max="500" step="1" value="500" aria-label="タッチ時間スライダー">
+<div class="numeric-row"><input id="curveDurationNumber" class="input" type="number" inputmode="numeric" min="50" max="5000" step="1" value="500"><span>ms</span></div>
+<input id="curveDuration" type="range" min="50" max="5000" step="1" value="500" aria-label="タッチ時間スライダー">
 <label class="fieldlabel" for="existingDistanceNumber">なぞり距離（pt）</label>
 <div class="numeric-row"><input id="existingDistanceNumber" class="input" type="number" inputmode="decimal" min="10" max="700" step="0.1" value="100"><span>pt</span></div>
 <input id="existingDistance" type="range" min="10" max="700" step="0.1" value="100" aria-label="なぞり距離スライダー">
@@ -721,7 +721,7 @@ function linkExistingControls(rangeId,numberId,min,max){
  });
 }
 linkExistingControls('existingDistance','existingDistanceNumber',10,700);
-linkExistingControls('curveDuration','curveDurationNumber',50,500);
+linkExistingControls('curveDuration','curveDurationNumber',50,5000);
 $('existingReverse').addEventListener('change',updateExistingPreview);
 $('resetExisting').addEventListener('click',()=>{if(!selectedExistingKey)return;const record=existingRecords.find(x=>x.key===selectedExistingKey);originalEdits.delete(selectedExistingKey);selectExisting(record);curveMessage('このコマンドの変更を取り消しました。')});
 function populateExisting(){
@@ -756,7 +756,7 @@ function selectExisting(record){
   if(!Number.isFinite(originalLength)||originalLength<1)throw Error('軌跡の距離を計算できません');
   const currentDistance=edit?.distance??originalLength;
   const distanceValue=Math.min(700,Math.max(10,Math.round(currentDistance*10)/10));
-  const durationValue=Math.round(Math.min(500,Math.max(50,edit?.duration??orig.duration)));
+  const durationValue=Math.round(Math.min(5000,Math.max(50,edit?.duration??orig.duration)));
   $('existingDistance').value=distanceValue;
   $('existingDistanceNumber').value=distanceValue;
   $('curveDuration').value=durationValue;
@@ -774,7 +774,7 @@ $('curveApply').addEventListener('click',()=>{try{
  if(!selectedExistingKey||!selectedOriginalPath)throw Error('編集するジェスチャーを一覧から選んでください。');
  const distance=Number($('existingDistanceNumber').value),duration=Number($('curveDurationNumber').value);
  if(!Number.isFinite(distance)||distance<10||distance>700)throw Error('なぞり距離は10〜700 ptで入力してください');
- if(!Number.isFinite(duration)||duration<50||duration>500)throw Error('タッチ時間は50〜500 msで入力してください');
+ if(!Number.isFinite(duration)||duration<50||duration>5000)throw Error('タッチ時間は50〜5000 msで入力してください');
  const reverse=$('existingReverse').value==='reverse';
  originalEdits.set(selectedExistingKey,{distance,duration,reverse});
  const item=existingRecords.find(x=>x.key===selectedExistingKey);

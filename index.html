@@ -8,7 +8,7 @@ main{max-width:1600px;margin:auto;padding:14px 14px 28px}
 header{display:flex;align-items:center;gap:17px;margin:0 5px 14px}.brand-icon{width:61px;height:61px;display:grid;place-items:center;position:relative;flex:0 0 61px;color:#f4f8ff}
 .brand-icon svg{width:60px;height:60px}h1{font-size:clamp(20px,2.18vw,33px);line-height:1.22;letter-spacing:.015em;margin:0 0 4px;font-weight:800}.lead{margin:0;font-size:clamp(11px,1.13vw,15px);color:#e1eaf4}
 .help{margin-left:auto;white-space:nowrap;border:1px solid #687f9b;padding:9px 16px;background:#152335;color:#eef6ff;border-radius:10px;font-weight:750}
-.tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:15px}.tab{color:#e9f4ff;background:linear-gradient(#192b40,#172335);border:1px solid #5c7595;border-radius:11px;padding:12px 8px;min-height:55px;font-size:clamp(12px,1.43vw,19px);font-weight:800}.tab.active{background:linear-gradient(180deg,#2fa8fa,#0874ed);border-color:#76d4ff;box-shadow:inset 0 0 0 1px #30b5ff}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:15px}.tab{color:#e9f4ff;background:linear-gradient(#192b40,#172335);border:1px solid #5c7595;border-radius:11px;padding:12px 8px;min-height:55px;font-size:clamp(12px,1.43vw,19px);font-weight:800}.tab.active{background:linear-gradient(180deg,#2fa8fa,#0874ed);border-color:#76d4ff;box-shadow:inset 0 0 0 1px #30b5ff}
 .work{display:grid;grid-template-columns:1.12fr .92fr 1.08fr;gap:12px;align-items:start}.stack{display:grid;gap:12px;min-width:0}.panel{min-width:0;background:linear-gradient(155deg,#172739,#121e2e);border:1px solid #66809e;border-radius:16px;overflow:hidden}.panel-pad{padding:14px}.panel h2{font-size:clamp(16px,1.55vw,21px);margin:0 0 11px;font-weight:800;line-height:1.35}.panel-title{padding:14px 15px;border-bottom:1px solid #465d77;margin:0!important}
 .filebar{display:flex;gap:9px;align-items:center;margin-bottom:12px;min-width:0}.btn{border-radius:9px;border:1px solid #7790b0;background:linear-gradient(#25384e,#1d2a3d);color:#f1f7ff;padding:10px 12px;font-weight:750;font-size:13px;line-height:1.3;white-space:normal}
 .btn-blue{background:linear-gradient(#29aeff,#0876ee);border-color:#77ddff;color:#fff}.btn-green{background:linear-gradient(#03be66,#009b4f);border-color:#55f3a9;color:#fff}.btn.wide{width:100%;min-height:57px;font-size:18px}
@@ -47,13 +47,40 @@ input[type=range]{width:100%;accent-color:#168cf9;min-width:0;cursor:pointer;hei
 @media(max-width:690px){main{padding:12px 10px 35px}header{gap:8px;margin:0 0 15px}.brand-icon{width:44px;height:44px;flex-basis:44px}.brand-icon svg{width:43px;height:43px}h1{font-size:18px}.lead{font-size:10px}.help{padding:6px 8px;font-size:11px}.tabbar{gap:4px}.tab{min-height:47px;padding:8px 4px;font-size:11px;border-radius:8px}.work{grid-template-columns:1fr;gap:11px}.stack.left,.stack.right{grid-row:auto;grid-column:auto}.preview-holder{height:min(125vw,570px);min-height:360px}.panel-pad{padding:12px}.panel h2{font-size:17px}.preview-wrap{grid-template-columns:minmax(0,1fr) 122px}.stat b{font-size:20px}.angleLine{grid-template-columns:90px 1fr}.angle-edit{gap:4px}.angle-edit .tiny{min-width:36px;padding:8px 5px}.angle-edit .input{max-width:115px}.angle-edit select{max-width:79px}.control{grid-template-columns:100px minmax(0,1fr) 73px;gap:5px;margin:11px 0}.btn.wide{font-size:16px}#compassCanvas{height:270px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 .source-picker{display:grid;gap:8px;margin:0 0 13px}.source-picker label{font-size:13px;font-weight:750}.source-picker select{width:100%;background:#15273a;color:#e9f2ff;border:1px solid #647f9d;padding:10px;border-radius:9px}.source-picker button{width:100%}.source-picker button.picking{background:#105687;border-color:#40cfff}.source-picker .micro{margin:0}.preview-holder.picking #photoCanvas{cursor:crosshair}
+
+/* Imported command / freehand editor */
+.curve-area{margin-top:10px;border-radius:13px;border:1px solid #426c92;background:#0c192b;padding:12px}
+.curve-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}.curve-toolbar .btn{font-size:12px;padding:8px 10px}
+#pathCanvas{display:block;width:min(100%,250px);height:auto;aspect-ratio:430 / 1050;touch-action:none;border:2px solid #4b829d;border-radius:12px;background:#101c31;margin:12px auto}
+.curve-info{font-size:12px;color:#b8d5e7;line-height:1.6;white-space:pre-wrap}
+.curve-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0}.curve-row input[type=text]{flex:1;min-width:130px}
+.curve-row label{font-size:12px}
+#existingCommands{max-height:300px;overflow-y:auto;display:grid;gap:7px;margin:10px 0}
+.existing-item{border:1px solid #446785;border-radius:9px;padding:9px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#13273b}
+.existing-item strong{font-size:13px;overflow-wrap:anywhere}.existing-item small{color:#aac7e1;font-size:11px;display:block}
+.existing-item button{flex-shrink:0}
+#curveDuration{width:100%}#editorStatus{color:#bcead7;font-size:12px;white-space:pre-wrap;line-height:1.6}
+
+/* Split pages: image/manual/new-command mode vs original command editor */
+body[data-page="existing"] .stack.left,body[data-page="existing"] .stack.middle{display:none}
+body[data-page="existing"] .stack.right > :not(#existingEditorPanel):not(.green-section){display:none}
+body:not([data-page="existing"]) #existingEditorPanel{display:none}
+body[data-page="existing"] .work{grid-template-columns:minmax(0,1fr);max-width:900px;margin:0 auto}
+body[data-page="existing"] .stack.right{grid-column:1;grid-row:1}
+body[data-page="existing"] .green-section{grid-row:1}
+body[data-page="existing"] #existingEditorPanel{grid-row:2}
+.curve-preview{display:grid;grid-template-columns:180px minmax(0,1fr);gap:16px;align-items:start}
+.curve-inputs{min-width:0;display:grid;gap:8px}
+#pathCanvas{width:180px;max-width:100%;touch-action:auto;pointer-events:none;margin:0 auto}
+#existingControls[hidden]{display:none!important}
+@media(max-width:690px){.tabbar{grid-template-columns:repeat(2,minmax(0,1fr))}.tab{font-size:12px}.curve-preview{grid-template-columns:120px minmax(0,1fr);gap:10px}#pathCanvas{width:120px}body[data-page="existing"] .stack.right{grid-column:1}}
 </style></head><body>
 <main>
 <header>
 <div class="brand-icon" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="5"/><circle cx="30" cy="30" r="6" fill="currentColor"/><path d="M30 2v15M30 43v15M2 30h15M43 30h15" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg></div>
 <div><h1>モンスト ジェスチャー設定ツール v1.0</h1><p class="lead">矢印から伸びる軌道線の中心を検出し、角度を設定できます。</p></div>
 <button class="help" id="helpBtn">？ 使い方</button></header>
-<nav class="tabbar" aria-label="編集モード"><button class="tab active" data-tab="image">▧　画像から角度を設定（自動検出）</button><button class="tab" data-tab="manual">⚒　手動で設定</button><button class="tab" data-tab="commands">☷　コマンド一覧</button></nav>
+<nav class="tabbar" aria-label="編集モード"><button class="tab active" data-tab="image">▧　画像から角度を設定（自動検出）</button><button class="tab" data-tab="manual">⚒　手動で設定</button><button class="tab" data-tab="commands">☷　新規コマンド一覧</button><button class="tab" data-tab="existing">▤　既存コマンド編集</button></nav>
 <div class="work">
 <div class="stack left">
 <section class="panel" id="imagePanel"><div class="panel-pad">
@@ -90,7 +117,26 @@ input[type=range]{width:100%;accent-color:#168cf9;min-width:0;cursor:pointer;hei
 <div class="stack right">
 <section class="panel"><h2 class="panel-title">プレビュー（設定した角度の軌道）</h2><div class="preview-wrap"><canvas id="compassCanvas" width="400" height="350" aria-label="方向プレビュー"></canvas><div class="preview-stats"><div class="stat"><small>角度</small><b id="previewAngle">0.000°</b></div><div class="stat"><small>方向</small><p id="previewDirection">まっすぐ上（0°）</p></div><div class="stat"><small>なぞり距離</small><b id="previewDistance">600 pt</b></div></div></div><div class="infoBanner">✓ 距離に合わせてプレビューが変化します。</div></section>
 <section class="panel"><h2 class="panel-title">コマンド一覧（<span id="listCount">0</span>件）</h2><div id="commandList" class="list"><div class="empty-list">まだコマンドがありません。</div></div></section>
-<section class="green-section"><div class="exportSub"><strong style="font-size:15px">① 元の音声コントロールファイルを読み込む</strong><span class="source-help">.voicecontrolcommands ファイルを選んでください。</span><input type="file" id="sourceFile" aria-label="元の.voicecontrolcommandsを選択"><span class="fileStatus" id="sourceName">元のファイル：未選択</span><div id="sourceReadStatus" role="status" aria-live="polite">読み込み待ち：まだファイルを選択していません。</div><strong style="font-size:15px;margin-top:10px">② コマンドを登録してまとめて保存</strong><button class="btn btn-green wide" id="generate">↓ まとめて保存<br><span style="font-size:13px">（.voicecontrolcommands）</span></button><div class="exportlog" id="exportStatus"></div></div></section>
+
+<section class="panel" id="existingEditorPanel"><div class="panel-pad">
+<h2>既存コマンドの編集</h2>
+<p class="subtle">手書きジェスチャーの形を残したまま、タッチ時間と移動距離だけを変更できます。</p>
+<div id="existingCommands"><span class="subtle">ファイルを選択してください。</span></div>
+<div class="curve-area" id="existingControls" hidden>
+<strong id="editingLabel">編集対象</strong>
+<div class="curve-preview"><canvas id="pathCanvas" width="430" height="1050" aria-label="元のジェスチャー軌跡（編集不可）"></canvas>
+<div class="curve-inputs">
+<label class="fieldlabel" for="curveDuration">タッチ時間 <b id="curveTimeValue">500 ms</b></label>
+<input id="curveDuration" type="range" min="50" max="5000" step="10" value="500">
+<label class="fieldlabel" for="existingDistance">移動距離 <b id="existingDistanceValue">100 pt</b></label>
+<input id="existingDistance" type="range" min="10" max="700" step="1" value="100">
+<p class="micro" id="existingDistanceOriginal">元の軌跡を保ちながら拡大・縮小します。</p>
+<button id="curveApply" type="button" class="btn btn-blue wide">このコマンドの変更を保存</button>
+<button id="resetExisting" type="button" class="btn">変更を取り消す</button>
+</div></div>
+<div id="editorStatus" role="status" class="subtle"></div>
+</div></div></section>
+<section class="green-section"><div class="exportSub"><strong style="font-size:15px">元の音声コントロールファイルを読み込む</strong><span class="source-help">.voicecontrolcommands ファイルを選んでください。</span><input type="file" id="sourceFile" aria-label="元の.voicecontrolcommandsを選択"><span class="fileStatus" id="sourceName">元のファイル：未選択</span><div id="sourceReadStatus" role="status" aria-live="polite">読み込み待ち：まだファイルを選択していません。</div><strong style="font-size:15px;margin-top:10px">編集内容と新規コマンドをまとめて保存</strong><button class="btn btn-green wide" id="generate">↓ まとめて保存<br><span style="font-size:13px">（.voicecontrolcommands）</span></button><div class="exportlog" id="exportStatus"></div></div></section>
 </div></div>
 
 </main>
@@ -153,7 +199,7 @@ function setAngle(n,source='manual'){
  if(source==='manual' && state.lineIndex>=0){$('detectedAngle').textContent=formatAngle(state.lines[state.lineIndex].angle)+'（検出）'}
 }
 function setMode(name){
- state.mode=name;
+ state.mode=name;document.body.dataset.page=name;
  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
  $('imagePanel').classList.toggle('hidden',name!=='image');$('manualPanel').classList.toggle('hidden',name!=='manual');$('commandsPanel').classList.toggle('hidden',name!=='commands');
  drawCompass();drawManual();
@@ -461,12 +507,12 @@ $('addCommand').addEventListener('click',()=>{try{const item=readCommand();state
 // The iPhone Files picker may hide custom extensions when accept= is specified.
 // Selection is unrestricted. XML plist and binary plist can both be imported.
 let importedSource=null;
-function readBinaryPlist(buf){
+function readBinaryPlist(buf,preserveUid=false){
  const bytes=new Uint8Array(buf), dv=new DataView(buf);
  if(String.fromCharCode(...bytes.subarray(0,8))!=='bplist00')throw Error('バイナリplistのヘッダーが不正です。');
  const n=bytes.length;if(n<40)throw Error('ファイルが短すぎます。');
  const os=bytes[n-26],rs=bytes[n-25];
- function uint(pos,len){if(len<1||len>8||pos<0||pos+len>n)throw Error('plistの長さ情報が不正です。');let v=0;for(let i=0;i<len;i++)v=v*256+bytes[pos+i];if(!Number.isSafeInteger(v))throw Error('plistの整数が大きすぎます。');return v}
+ function uint(pos,len){if(len<1||len>8||pos<0||pos+len>n)throw Error('plistの長さ情報が不正です。 pos='+pos+' len='+len+' n='+n);let v=0;for(let i=0;i<len;i++)v=v*256+bytes[pos+i];if(!Number.isSafeInteger(v))throw Error('plistの整数が大きすぎます。');return v}
  const count=uint(n-24,8),top=uint(n-16,8),off=uint(n-8,8);
  if(count<1||count>200000||top>=count||off>=n-32||!os||!rs)throw Error('plistの管理情報が不正です。');
  const offsets=Array.from({length:count},(_,i)=>uint(off+i*os,os));
@@ -479,12 +525,12 @@ function readBinaryPlist(buf){
   const size=()=>{if(lo!==15)return [lo,p+1];let h=bytes[p+1],k=1<<(h&15);if((h>>4)!==1)throw Error('plistのサイズ表記が不正です。');return [uint(p+2,k),p+2+k]};
   let v;
   if(type===0){v=lo===8?false:lo===9?true:null}
-  else if(type===1){const k=1<<lo;v=uint(p+1,k)}
+  else if(type===1){const k=1<<lo;if(k<=8)v=uint(p+1,k);else if(k===16){let q=0n;for(let j=0;j<k;j++)q=(q<<8n)+BigInt(bytes[p+1+j]);if(q>=(1n<<127n))q-=1n<<128n;v=Number(q);if(!Number.isSafeInteger(v))throw Error('16バイト整数が大きすぎます。')}else throw Error('未対応の整数長です。')}
   else if(type===2){const k=1<<lo;v=k===4?dv.getFloat32(p+1,false):k===8?dv.getFloat64(p+1,false):NaN;if(!Number.isFinite(v))throw Error('plistの実数が不正です。')}
   else if(type===3){if(lo!==3)throw Error('plistの日時形式が不正です。');v=new Date(978307200000+dv.getFloat64(p+1,false)*1000)}
   else if(type===4){const [l,s]=size();v=bytes.slice(s,s+l)}
   else if(type===5||type===6){const [l,s]=size();if(type===5)v=ascii(s,l);else{const units=[];for(let j=0;j<l;j++)units.push(uint(s+j*2,2));v='';for(let j=0;j<units.length;j+=8000)v+=String.fromCharCode(...units.slice(j,j+8000))}}
-  else if(type===8){v=uint(p+1,lo+1)}
+  else if(type===8){const u=uint(p+1,lo+1);v=preserveUid?{__uid:u}:u}
   else if(type===10||type===12){const [l,s]=size();if(l>500000)throw Error('配列が長すぎます。');v=[];cache.set(id,v);for(let j=0;j<l;j++)v.push(parse(uint(s+j*rs,rs),depth+1));return v}
   else if(type===13){const [l,s]=size();if(l>500000)throw Error('辞書が大きすぎます。');v=Object.create(null);cache.set(id,v);for(let j=0;j<l;j++){const key=parse(uint(s+j*rs,rs),depth+1),value=parse(uint(s+(l+j)*rs,rs),depth+1);v[String(key)]=value}return v}
   else throw Error('このバイナリplistのデータ型 '+type+' に対応していません。');
@@ -553,44 +599,195 @@ $('sourceFile').addEventListener('change',async()=>{
   if($('sourceFile').files[0]!==file)return;
   importedSource=imported;
   const s=imported.info;
-  if(s.hasTemplate)showSourceMessage('✓ 読み込み成功！\n'+imported.kind+' / 既存コマンド：'+s.total+'件\nコマンドを追加して「まとめて保存」を押してください。','ok');
+  if(s.hasTemplate)showSourceMessage('✓ 読み込み成功！\n'+imported.kind+' / 既存コマンド：'+s.total+'件\nコマンドを編集または追加して「まとめて保存」を押してください。','ok');
   else showSourceMessage('ファイルは読み込めましたが、複製可能なカスタムジェスチャーがありません。\n元のファイルにカスタムジェスチャーを1件以上登録してから、もう一度書き出してください。','err');
  }catch(e){showSourceMessage('読み込みエラー：'+e.message+'\n※「ファイル」アプリに保存した音声コントロールの書き出しファイルを選択してください。','err')}
 });
-$('generate').addEventListener('click',async()=>{try{
- const file=$('sourceFile').files[0];if(!file)throw Error('先に元の.voicecontrolcommandsファイルを選択してください。');
- if(!state.commands.length)throw Error('先に「＋ コマンドを追加」を押してください。');
- const imported=importedSource&&importedSource.fileName===file.name?importedSource:await openSourceFile(file);
- if(!imported.info.hasTemplate)throw Error('元ファイルにカスタムジェスチャーのひな形がありません。');
- // Clone a fresh DOM each time to avoid duplicating commands on repeated exports.
- const doc=new DOMParser().parseFromString(imported.content,'application/xml');
- const root=[...doc.documentElement.children].find(x=>x.tagName==='dict'),table=childVal(root,'CommandsTable');
- const children=[...table.children],keys=new Set();let original=null,originalCount=0;
- for(let i=0;i<children.length-1;i++){
-  if(children[i].tagName==='key'&&children[i+1].tagName==='dict'){
-   keys.add(children[i].textContent);const body=children[i+1];
-   const names=childVal(body,'CustomCommands'),gest=childVal(body,'CustomGesture');
-   if(names&&gest&&gest.tagName==='data'&&childVal(names,'ja_JP')?.tagName==='array')original=body;
-   originalCount++;i++;
+
+// Original commands are edited in place in the freshly cloned source XML.
+// Unmodified commands retain their exact original CustomGesture data.
+const originalEdits=new Map();
+let existingRecords=[],selectedExistingKey=null,selectedOriginalPath=null,currentCurve=null;
+let originalLength=0,originalDuration=500;
+const pathCanvas=$('pathCanvas'),pathCtx=pathCanvas.getContext('2d');
+const uid=x=>x&&typeof x==='object'&&Number.isInteger(x.__uid)?x.__uid:null;
+const base64Bytes=b=>{const raw=atob(String(b).replace(/\s/g,'')),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out};
+function eventFields(arch){
+ const obj=arch.$objects,ref=uid(arch.$top?.root),root=obj[ref];
+ const all=obj[uid(root?.AllEvents)];
+ if(!Array.isArray(all?.['NS.objects']))throw Error('このジェスチャーのイベント形式は未対応です。');
+ let result=[];
+ for(const eventRef of all['NS.objects']){
+  const event=obj[uid(eventRef)];if(!event)continue;
+  const names=(event['NS.keys']||[]).map(x=>obj[uid(x)]),refs=event['NS.objects']||[];
+  const pos=names.indexOf('Fingers'),tim=names.indexOf('Time');
+  if(tim<0)continue;
+  let timeId=uid(refs[tim]),time=obj[timeId];
+  if(time&&typeof time==='object'&&Array.isArray(time['NS.objects']))timeId=uid(time['NS.objects'][0]);
+  let pointId=null,point=null;
+  if(pos>=0){const f=obj[uid(refs[pos])];
+   const fingerRefs=f&&f['NS.objects'];
+   if(fingerRefs?.length>1)throw Error('複数指のジェスチャーは安全に編集できません。');
+   if(fingerRefs?.length){const v=obj[uid(fingerRefs[0])];pointId=uid(v?.['NS.pointval']);
+    const raw=obj[pointId];const match=typeof raw==='string'&&raw.match(/^\{\s*([-+\d.eE]+)\s*,\s*([-+\d.eE]+)\s*\}$/);
+    if(match)point={x:Number(match[1]),y:Number(match[2])};
+   }
   }
+  result.push({timeId,pointId,point,time:obj[timeId]});
  }
- if(!original)throw Error('既存ファイルにカスタムジェスチャーがありません。');
+ return result;
+}
+function extractArchiveData(node){
+ if(!node||node.tagName!=='data')throw Error('カスタムジェスチャーがありません。');
+ const bytes=base64Bytes(node.textContent),arch=readBinaryPlist(bytes.buffer,true),events=eventFields(arch);
+ const positions=events.filter(e=>e.point&&Number.isFinite(e.point.x)&&Number.isFinite(e.point.y));
+ if(positions.length<2)throw Error('位置情報を2点以上取得できません。');
+ if(positions.some(e=>e.point.x< -2000||e.point.y< -2000||e.point.x>3000||e.point.y>3000))throw Error('座標の範囲が未対応です。');
+ const path=positions.map(e=>e.point);
+ const t=events.filter(e=>Number.isFinite(e.time)).map(e=>e.time);
+ const duration=t.length>1?Math.max(50,Math.round((Math.max(...t)-Math.min(...t))*1000)):500;
+ return {arch,events,path,duration,bytes};
+}
+function samplePath(path,n){
+ if(!Array.isArray(path)||path.length<2)throw Error('2点以上の軌跡を描いてください。');
+ const lengths=[0];for(let i=1;i<path.length;i++)lengths.push(lengths[i-1]+Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y));
+ const total=lengths.at(-1);if(total<2)throw Error('軌跡が短すぎます。');
+ const points=[];for(let i=0;i<n;i++){
+  const target=total*i/(n-1);let j=1;while(j<lengths.length-1&&lengths[j]<target)j++;
+  const span=lengths[j]-lengths[j-1],ratio=span>0?(target-lengths[j-1])/span:0;
+  points.push({x:path[j-1].x+(path[j].x-path[j-1].x)*ratio,y:path[j-1].y+(path[j].y-path[j-1].y)*ratio});
+ }return points;
+}
+function modifyArchive(arch,path,requestedDuration){
+ const copy=JSON.parse(JSON.stringify(arch)),events=eventFields(copy),positions=events.filter(e=>e.pointId!==null&&e.point);
+ const sampled=path.length===positions.length?path:samplePath(path,positions.length);
+ positions.forEach((e,i)=>{copy.$objects[e.pointId]=`{${sampled[i].x.toFixed(4)}, ${sampled[i].y.toFixed(4)}}`});
+ if(requestedDuration!==null){
+  const times=events.filter(e=>Number.isFinite(e.time));const t0=times[0]?.time??0,tLast=times.at(-1)?.time??t0;
+  if(tLast>t0){for(const e of times)copy.$objects[e.timeId]=t0+(e.time-t0)/(tLast-t0)*requestedDuration/1000;}
+ }
+ return bplist(copy);
+}
+function drawCurve(){
+ const c=pathCtx,w=pathCanvas.width,h=pathCanvas.height;
+ c.clearRect(0,0,w,h);c.fillStyle='#101e30';c.fillRect(0,0,w,h);
+ c.strokeStyle='#283e53';c.lineWidth=1;
+ for(let x=0;x<=w;x+=43){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke()}
+ for(let y=0;y<=h;y+=105){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke()}
+ if(!currentCurve||currentCurve.length<1)return;
+ c.strokeStyle='#55dcff';c.lineWidth=5;c.lineCap='round';c.lineJoin='round';
+ c.beginPath();c.moveTo(currentCurve[0].x,currentCurve[0].y);for(const p of currentCurve.slice(1))c.lineTo(p.x,p.y);c.stroke();
+ const a=currentCurve[0],b=currentCurve.at(-1);
+ for(const [p,color] of [[a,'#4deb9e'],[b,'#ff818f']]){c.beginPath();c.fillStyle=color;c.arc(p.x,p.y,9,0,Math.PI*2);c.fill();}
+ if(currentCurve.length>2){c.fillStyle='#b3d7ec';c.font='21px sans-serif';c.fillText('始点',Math.max(8,a.x-16),Math.max(25,a.y-15));}
+}
+function straightCurve(){const s=getSettings();return [{x:s.x,y:s.y},{x:s.ex,y:s.ey}]}
+function curveMessage(msg){$('editorStatus').textContent=msg}
+function selectedCurve(path){currentCurve=path.map(p=>({x:p.x,y:p.y}));drawCurve()}
+function pathLength(path){let d=0;for(let i=1;i<path.length;i++)d+=Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y);return d}
+function rescalePath(path,length){const old=pathLength(path);if(old<.01)throw Error('距離が短すぎるジェスチャーです');const k=length/old,base=path[0];return path.map(p=>({x:base.x+(p.x-base.x)*k,y:base.y+(p.y-base.y)*k}))}
+function updateExistingPreview(){if(!selectedOriginalPath)return;const d=Number($('existingDistance').value);$('existingDistanceValue').textContent=d+' pt';$('curveTimeValue').textContent=$('curveDuration').value+' ms';selectedCurve(rescalePath(selectedOriginalPath,d))}
+$('existingDistance').addEventListener('input',updateExistingPreview);
+$('curveDuration').addEventListener('input',()=>{$('curveTimeValue').textContent=$('curveDuration').value+' ms'});
+$('resetExisting').addEventListener('click',()=>{if(!selectedExistingKey)return;const record=existingRecords.find(x=>x.key===selectedExistingKey);originalEdits.delete(selectedExistingKey);selectExisting(record);curveMessage('このコマンドの変更を取り消しました。')});
+function populateExisting(){
+ const host=$('existingCommands');host.replaceChildren();existingRecords=[];selectedExistingKey=null;selectedOriginalPath=null;$('existingControls').hidden=true;
+ if(!importedSource){host.textContent='ファイルの読み込み待ち';return}
+ const doc=new DOMParser().parseFromString(importedSource.content,'application/xml');
+ const root=[...doc.documentElement.children].find(x=>x.tagName==='dict'),table=childVal(root,'CommandsTable');
+ const kids=[...table.children];for(let i=0;i<kids.length-1;i++){
+  if(kids[i].tagName!=='key'||kids[i+1].tagName!=='dict')continue;
+  const key=kids[i].textContent,body=kids[i+1],n=childVal(childVal(body,'CustomCommands')||body,'ja_JP');
+  const name=n?.querySelector('string')?.textContent||'（名称なし）';
+  const data=childVal(body,'CustomGesture');existingRecords.push({key,name,data,editable:!!data});i++;
+ }
+ for(const record of existingRecords){
+  const row=document.createElement('div');row.className='existing-item';
+  const col=document.createElement('div'),title=document.createElement('strong'),sub=document.createElement('small');
+  const edit=originalEdits.get(record.key);title.textContent=edit?.name??record.name;
+  sub.textContent=edit?'変更あり':record.editable?'時間・距離を編集可能':'編集不可';col.append(title,sub);
+  const button=document.createElement('button');button.type='button';button.className='btn';button.textContent='編集';button.dataset.key=record.key;button.addEventListener('click',()=>selectExisting(record));
+  row.append(col,button);host.append(row);
+ }
+ if(!existingRecords.length)host.textContent='編集できるコマンドがありません。';
+}
+function selectExisting(record){
+ selectedExistingKey=record.key;
+ const edit=originalEdits.get(record.key);
+ $('existingControls').hidden=true;
+ try{
+  if(!record.data)throw Error('このコマンドには編集できるジェスチャーがありません。');
+  const orig=extractArchiveData(record.data);selectedOriginalPath=orig.path;
+  originalLength=pathLength(orig.path);originalDuration=orig.duration;
+  if(!Number.isFinite(originalLength)||originalLength<1)throw Error('軌跡の距離を計算できません');
+  const currentDistance=edit?.distance??originalLength;
+  $('existingDistance').value=Math.round(Math.min(700,Math.max(10,currentDistance)));
+  $('curveDuration').value=Math.round(Math.min(5000,Math.max(50,edit?.duration??orig.duration))/10)*10;
+  $('existingDistanceOriginal').textContent='元の移動距離：約'+originalLength.toFixed(1)+' pt（軌跡の形は維持）';
+  $('editingLabel').textContent='編集対象：'+record.name;
+  $('existingControls').hidden=false;
+  updateExistingPreview();
+  curveMessage('時間と距離を調整したあと「変更を保存」を押してください。');
+ }catch(err){selectedOriginalPath=null;curveMessage('編集不可：'+err.message)}
+ $('existingEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('curveApply').addEventListener('click',()=>{try{
+ if(!selectedExistingKey||!selectedOriginalPath)throw Error('編集するジェスチャーを一覧から選んでください。');
+ const distance=Number($('existingDistance').value),duration=Number($('curveDuration').value);
+ originalEdits.set(selectedExistingKey,{distance,duration});
+ const item=existingRecords.find(x=>x.key===selectedExistingKey);
+ curveMessage('「'+item.name+'」の時間と距離の変更を登録しました。最後に「まとめて保存」を押してください。');
+ for(const row of $('existingCommands').querySelectorAll('.existing-item')){const button=row.querySelector('button');if(button?.dataset.key===selectedExistingKey){row.querySelector('small').textContent='変更あり';}}
+ }catch(e){curveMessage('エラー：'+e.message)}
+});
+$('sourceFile').addEventListener('change',async()=>{
+ const file=$('sourceFile').files[0];originalEdits.clear();existingRecords=[];selectedExistingKey=null;
+ if(!file){populateExisting();return}
+ try{
+  const src=await openSourceFile(file);
+  if($('sourceFile').files[0]!==file)return;
+  importedSource=src;populateExisting();
+ }catch(e){curveMessage('既存コマンドの一覧を読み込めません：'+e.message)}
+});
+$('generate').addEventListener('click',async()=>{try{
+ const f=$('sourceFile').files[0];if(!f)throw Error('元の.voicecontrolcommandsファイルを選択してください。');
+ const src=importedSource&&importedSource.fileName===f.name?importedSource:await openSourceFile(f);
+ if(!src.info.hasTemplate)throw Error('ジェスチャーを含むコマンドが必要です。');
+ const doc=new DOMParser().parseFromString(src.content,'application/xml'),root=[...doc.documentElement.children].find(x=>x.tagName==='dict'),table=childVal(root,'CommandsTable');
+ const nodes=[...table.children],keys=new Set();let template=null,originalCount=0;
+ for(let i=0;i<nodes.length-1;i++){
+  const key=nodes[i],body=nodes[i+1];if(key.tagName!=='key'||body.tagName!=='dict')continue;
+  const id=key.textContent;keys.add(id);originalCount++;
+  const names=childVal(body,'CustomCommands'),locale=names&&childVal(names,'ja_JP'),data=childVal(body,'CustomGesture');
+  if(locale?.tagName==='array'&&data?.tagName==='data')template=body.cloneNode(true);
+  const edit=originalEdits.get(id);
+  if(edit){
+   if(edit.distance!==null||edit.duration!==null){
+    if(!data)throw Error('編集対象「'+id+'」にジェスチャーがありません。');
+    const archived=extractArchiveData(data);
+    const scaled=edit.distance==null?archived.path:rescalePath(archived.path,edit.distance);
+    const bytes=modifyArchive(archived.arch,scaled,edit.duration);
+    data.textContent='\n'+encode64(bytes).replace(/.{1,68}/g,'$&\n');
+   }
+  }
+  i++;
+ }
+ if(!template&&state.commands.length)throw Error('追加用ジェスチャーのひな形がありません。');
  for(const item of state.commands){
-  const copy=original.cloneNode(true),names=childVal(copy,'CustomCommands'),locale=childVal(names,'ja_JP');
-  locale.replaceChildren();const word=doc.createElement('string');word.textContent=item.name;locale.appendChild(word);
-  const gest=childVal(copy,'CustomGesture');gest.textContent='\n'+encode64(gesture(item.s)).replace(/.{1,68}/g,'$&\n');
-  let key;do{key='Custom.'+Date.now()+'.'+Math.floor(Math.random()*1e12)}while(keys.has(key));
-  keys.add(key);const element=doc.createElement('key');element.textContent=key;table.append(element,copy);
+  const body=template.cloneNode(true),names=childVal(body,'CustomCommands'),locale=childVal(names,'ja_JP');locale.replaceChildren();
+  const str=doc.createElement('string');str.textContent=item.name;locale.append(str);
+  const data=childVal(body,'CustomGesture');data.textContent='\n'+encode64(gesture(item.s)).replace(/.{1,68}/g,'$&\n');
+  let id;do{id='Custom.'+Date.now()+'.'+Math.floor(Math.random()*1e12)}while(keys.has(id));keys.add(id);
+  const key=doc.createElement('key');key.textContent=id;table.append(key,body);
  }
+ if(!state.commands.length&&!originalEdits.size)throw Error('編集または追加するコマンドがありません。');
  const xml='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'+new XMLSerializer().serializeToString(doc.documentElement)+'\n';
  const blob=new Blob([xml],{type:'application/octet-stream'});
  if(state.lastUrl)URL.revokeObjectURL(state.lastUrl);state.lastUrl=URL.createObjectURL(blob);
- const name='ジェスチャー_'+state.commands.length+'件.voicecontrolcommands';
- const a=document.createElement('a');a.href=state.lastUrl;a.download=name;a.className='downloadLink';a.textContent='作成したファイルをダウンロード';
- $('exportStatus').replaceChildren(document.createTextNode('ファイルを生成しました。\n既存：'+originalCount+'件、追加：'+state.commands.length+'件\n'),a);
- a.click();
- }catch(err){$('exportStatus').textContent='エラー：'+err.message;console.error(err)}
+ const a=document.createElement('a');a.href=state.lastUrl;a.download='音声コマンド編集済.voicecontrolcommands';a.className='downloadLink';a.textContent='保存ファイルをもう一度ダウンロード';
+ $('exportStatus').replaceChildren(document.createTextNode('生成成功：既存'+originalCount+'件 / 編集'+originalEdits.size+'件 / 新規'+state.commands.length+'件\n'),a);a.click();
+ }catch(e){$('exportStatus').textContent='エラー：'+e.message;console.error(e)}
 });
 // First load: deliberately show no image.
-renderCommands();setAngle(0);showPhoto();drawCompass();drawManual();
+renderCommands();setMode("image");setAngle(0);showPhoto();drawCompass();drawManual();
 </script></body></html>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1422"><title>モンスト ジェスチャー設定ツール v1.0</title>
+<html lang="ja"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#0a1422" name="theme-color"/><title>モンスト ジェスチャー設定ツール v1.0</title>
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;color:#eef6ff;background:#091321;font-synthesis:none}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -140px,#182d46 0%,#0a1524 55%,#09111e 100%);line-height:1.45}
@@ -65,6 +65,9 @@ input[type=range]{width:100%;accent-color:#168cf9;min-width:0;cursor:pointer;hei
 body[data-page="existing"] .stack.left,body[data-page="existing"] .stack.middle{display:none}
 body[data-page="existing"] .stack.right > :not(#existingEditorPanel):not(.green-section){display:none}
 body:not([data-page="existing"]) #existingEditorPanel{display:none}
+body:not([data-page="commands"]) #libraryPanel{display:none}
+body[data-page="existing"] #libraryPanel{display:none}
+body[data-page="commands"] .stack.right #libraryPanel{display:block}
 body[data-page="existing"] .work{grid-template-columns:minmax(0,1fr);max-width:900px;margin:0 auto}
 body[data-page="existing"] .stack.right{grid-column:1;grid-row:1}
 body[data-page="existing"] .green-section{grid-row:1}
@@ -72,77 +75,193 @@ body[data-page="existing"] #existingEditorPanel{grid-row:2}
 .curve-preview{display:grid;grid-template-columns:180px minmax(0,1fr);gap:16px;align-items:start}
 .curve-inputs{min-width:0;display:grid;gap:8px}
 #pathCanvas{width:180px;max-width:100%;touch-action:auto;pointer-events:none;margin:0 auto}
-.visually-hidden{display:none}.small-number{width:78px!important;padding:7px 5px!important;text-align:center;font-variant-numeric:tabular-nums}.numeric-row{display:flex;align-items:center;gap:9px}.numeric-row input{flex:1;width:100%;min-width:0}.numeric-row span{min-width:25px;color:#bbd6e7;font-size:13px}#existingControls[hidden]{display:none!important}
+.visually-hidden{display:none}.small-number{width:78px!important;padding:7px 5px!important;text-align:center;font-variant-numeric:tabular-nums}.numeric-row{display:flex;align-items:center;gap:9px}.numeric-row input{flex:1;width:100%;min-width:0}.numeric-row span{min-width:25px;color:#bbd6e7;font-size:13px}#existingControls[hidden],#existingAngleGroup[hidden]{display:none!important}
 @media(max-width:690px){.tabbar{grid-template-columns:repeat(2,minmax(0,1fr))}.tab{font-size:12px}.curve-preview{grid-template-columns:120px minmax(0,1fr);gap:10px}#pathCanvas{width:120px}body[data-page="existing"] .stack.right{grid-column:1}}
+
+/* Command lists remain compact regardless of the number of registered commands. */
+.command-search{padding:10px 12px 0;display:flex;gap:8px;align-items:center}
+.command-search .input{flex:1;min-width:0;background:#102132}
+.command-search .search-count{white-space:nowrap;font-size:11px;color:#b9d2e8;min-width:49px;text-align:right}
+.command-list-scroll{max-height:290px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;align-content:start;-webkit-overflow-scrolling:touch}
+body[data-page="commands"] #commandListLeft{max-height:460px}
+.command-list-scroll .item{min-height:65px}
+.command-list-scroll .item .contents{flex:1}
+.command-list-scroll .item p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:690px){.command-list-scroll{max-height:260px}body[data-page="commands"] #commandListLeft{max-height:390px}.command-list-scroll .item{padding:9px 7px}.command-list-scroll .itemactions{gap:4px}.command-list-scroll .iconBtn{padding:7px}}
+
+.bulkbar{display:flex;justify-content:flex-end;padding:7px 13px 0}
+.bulk-delete{border-color:#b66a75;color:#ffd5dc;background:#472732;font-size:13px;padding:8px 11px}
+.bulk-delete:hover{background:#65303c}
+.bulk-delete:disabled{opacity:.45;cursor:not-allowed}
+</style><style>
+/* UI v1.0: compact four-screen layout; keep all existing controls and code */
+:root{color-scheme:dark}
+body{background:#0b1420;color:#eaf2fb}
+main{max-width:1180px;padding:16px 16px 48px}
+header{gap:12px;margin:0 0 16px}.brand-icon,.brand-icon svg{width:44px;height:44px;flex-basis:44px}
+h1{font-size:clamp(20px,2.4vw,27px);margin:0 0 3px}.lead{font-size:13px;color:#aebfd3}
+.tabbar{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.tab{min-height:48px;border-radius:11px;padding:10px 7px;font-size:14px;letter-spacing:0}
+.quickbar{border:1px solid #304a66;background:#132234;border-radius:11px;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.quicktext{color:#b6c7da;font-size:13px}
+.quickbar .btn{padding:8px 12px;font-size:12px;white-space:nowrap}
+.work{grid-template-columns:minmax(0,1.02fr) minmax(0,.95fr) minmax(0,.95fr);gap:12px}
+.stack{gap:12px}
+.panel{border:1px solid #324c67;border-radius:13px;background:#152337;box-shadow:0 4px 14px #00000015}
+.panel-pad{padding:15px}.panel h2{font-size:17px;margin-bottom:11px}.panel-title{font-size:17px;padding:13px 15px}
+.subtle,.micro,.photoHints{color:#b5c7da;line-height:1.6}
+.preview-holder{height:min(57vw,650px);min-height:390px}
+.btn{font-size:13px;border-color:#54728e}.btn.wide{font-size:16px;min-height:50px}
+.angle-card{margin-bottom:0}
+.advanced-detect{border:1px solid #425872;border-radius:9px;padding:9px 11px;margin:10px 0;background:#111e2e}
+.advanced-detect summary{cursor:pointer;color:#d5e8ff;font-size:13px;font-weight:700}
+.advanced-detect .source-picker{margin-top:10px}
+.command-list-scroll{max-height:340px;overflow-y:auto;overscroll-behavior:contain}
+#commandListLeft{max-height:430px}
+/* No duplicated registered list: the management screen has the single canonical list */
+.stack.right>section:has(#commandList){display:none!important}
+/* Main image/manual workspace; source export moves to dedicated management tab */
+body[data-page=image] .stack.right>#libraryPanel,
+body[data-page=manual] .stack.right>#libraryPanel,
+body[data-page=image] .stack.right>#existingEditorPanel,
+body[data-page=manual] .stack.right>#existingEditorPanel{display:none!important}
+body[data-page=image] .stack.right>.green-section,
+body[data-page=manual] .stack.right>.green-section{display:none!important}
+body[data-page=manual] .stack.middle>section:not(#settingsPanel){display:none!important}
+/* Management: one list + backup + export; no irrelevant preview or settings */
+body[data-page=commands] .stack.middle{display:none!important}
+body[data-page=commands] .stack.right>section:not(#libraryPanel):not(.green-section){display:none!important}
+body[data-page=commands] .stack.right{display:flex;flex-direction:column;gap:12px}
+body[data-page=commands] .stack.right>.green-section{display:block!important}
+body[data-page=commands] .stack.right>#libraryPanel{display:block!important}
+body[data-page=commands] .work{grid-template-columns:minmax(0,1fr) minmax(0,1fr);max-width:980px;margin:0 auto}
+body[data-page=commands] .stack.left{grid-column:1}
+body[data-page=commands] .stack.right{grid-column:2}
+body[data-page=commands] .stack.right>.green-section{order:-1}
+/* Existing edit: source first, then editor, with all controls preserved */
+body[data-page=existing] .stack.right{display:flex!important;flex-direction:column;gap:12px}
+body[data-page=existing] .stack.right>.green-section{order:-1}
+body[data-page=existing] .stack.right>#existingEditorPanel{display:block!important}
+body[data-page=existing] .stack.right>section:not(#existingEditorPanel):not(.green-section){display:none!important}
+body[data-page=existing] .stack.left,body[data-page=existing] .stack.middle{display:none!important}
+body[data-page=existing] .work{grid-template-columns:minmax(0,1fr);max-width:760px}
+body[data-page=existing] .stack.right{grid-column:1}
+/* Less tall at mobile scale */
+@media(max-width:920px){
+ .work{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ body[data-page=image] .stack.right,body[data-page=manual] .stack.right{grid-column:1/-1}
+ body[data-page=image] .stack.right>section:first-child,body[data-page=manual] .stack.right>section:first-child{max-width:650px;width:100%;margin:0 auto}
+}
+@media(max-width:690px){
+ main{padding:12px 10px 34px}
+ header{flex-wrap:wrap}.help{padding:7px 11px;margin-left:auto}
+ .brand-icon,.brand-icon svg{width:35px;height:35px;flex-basis:35px}
+ h1{font-size:19px}.lead{font-size:12px}
+ .tabbar{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:10px}
+ .tab{min-height:45px;font-size:12px;padding:8px 3px}
+ .quickbar{padding:9px 10px;gap:8px}.quicktext{font-size:11px}.quickbar .btn{font-size:11px;padding:8px 9px}
+ .work,body[data-page=commands] .work,body[data-page=existing] .work{display:flex;flex-direction:column;gap:11px;max-width:100%}
+ .work>.stack{display:flex;flex-direction:column;width:100%;gap:11px}
+ body[data-page=manual] .stack.left,body[data-page=image] .stack.left{order:0}
+ body[data-page=manual] .stack.middle,body[data-page=image] .stack.middle{order:1}
+ body[data-page=manual] .stack.right,body[data-page=image] .stack.right{order:2}
+ body[data-page=commands] .stack.middle,body[data-page=existing] .stack.left,body[data-page=existing] .stack.middle{display:none!important}
+ body[data-page=commands] .stack.left{order:0}body[data-page=commands] .stack.right{order:1}
+ .preview-holder{min-height:280px;height:min(150vw,680px)}
+ .panel-pad{padding:12px}.panel-title{padding:11px 13px}
+ #commandListLeft{max-height:350px}
+}
+
+/* ゲージ付きプリセット */
+.preset-area{margin-top:14px;display:grid;gap:6px}
+.preset-note{font-size:11px;line-height:1.55;color:#b6c5d5;margin:0;padding:7px 9px;border:1px solid #45566b;border-radius:7px;background:#142235}
+.preset-button{background:#284862;border:1px solid #69a9db;color:#eaf7ff;min-height:46px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.preset-button:hover{background:#315977}
+.preset-values{font-weight:500;font-size:12px;color:#c5e8ff}
 </style></head><body>
 <main>
 <header>
-<div class="brand-icon" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="5"/><circle cx="30" cy="30" r="6" fill="currentColor"/><path d="M30 2v15M30 43v15M2 30h15M43 30h15" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg></div>
-<div><h1>モンスト ジェスチャー設定ツール v1.0</h1><p class="lead">矢印から伸びる軌道線の中心を検出し、角度を設定できます。</p></div>
+<div aria-hidden="true" class="brand-icon"><svg fill="none" viewbox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="5"></circle><circle cx="30" cy="30" fill="currentColor" r="6"></circle><path d="M30 2v15M30 43v15M2 30h15M43 30h15" stroke="currentColor" stroke-linecap="round" stroke-width="5"></path></svg></div>
+<div><h1>モンスト ジェスチャー設定ツール v1.0</h1><p class="lead">画像から角度を取得し、コマンドを作成・編集できます。</p></div>
 <button class="help" id="helpBtn">？ 使い方</button></header>
-<nav class="tabbar" aria-label="編集モード"><button class="tab active" data-tab="image">▧　画像から角度を設定（自動検出）</button><button class="tab" data-tab="manual">⚒　手動で設定</button><button class="tab" data-tab="commands">☷　新規コマンド一覧</button><button class="tab" data-tab="existing">▤　既存コマンド編集</button></nav>
-<div class="work">
+<nav aria-label="編集モード" class="tabbar"><button class="tab active" data-tab="image">画像から設定</button><button class="tab" data-tab="manual">手動で設定</button><button class="tab" data-tab="commands">コマンド管理</button><button class="tab" data-tab="existing">既存コマンド編集</button></nav>
+<div class="quickbar" role="status"><span class="quicktext">① 設定 → ② 現在に追加 → ③ 現在の一覧だけ書き出し</span><button class="btn btn-blue" id="quickManage" type="button">コマンド管理を開く</button></div><div class="work">
 <div class="stack left">
 <section class="panel" id="imagePanel"><div class="panel-pad">
-<div class="filebar"><label for="imageFile" class="btn btn-blue fileLabel">▣ 画像を選択</label><input id="imageFile" type="file" accept="image/*"><span class="filename" id="imageName">画像は未選択です</span><button class="btn" id="clearImage">× クリア</button></div>
-<div class="preview-holder empty" id="photoHolder"><canvas id="photoCanvas" width="430" height="1000" aria-label="画像上の検出結果"></canvas><div id="emptyDisplay" class="empty-display"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="2"/><path d="m3 18 6-6 4 4 3-3 5 5"/></svg><strong>画像を選択してください</strong><span>スクリーンショットを選ぶと軌道線を検出します。</span></div><div class="photoTools" id="photoTools" hidden><button id="zoomIn" title="拡大">＋</button><button id="zoomOut" title="縮小">−</button><button id="zoomReset" title="全体表示">⛶</button></div></div>
-<p class="photoHints">赤・青の矢印から伸びる軌道線を探します。ずれる場合は矢印の位置をタップしてください。</p>
+<div class="filebar"><label class="btn btn-blue fileLabel" for="imageFile">▣ 画像を選択</label><input accept="image/*" id="imageFile" type="file"/><span class="filename" id="imageName">画像は未選択です</span><button class="btn" id="clearImage">× クリア</button></div>
+<div class="preview-holder empty" id="photoHolder"><canvas aria-label="画像上の検出結果" height="1000" id="photoCanvas" width="430"></canvas><div class="empty-display" id="emptyDisplay"><svg fill="none" height="64" stroke="currentColor" stroke-width="1.3" viewbox="0 0 24 24" width="64"><rect height="18" rx="2" width="20" x="2" y="3"></rect><circle cx="8.5" cy="8.5" r="2"></circle><path d="m3 18 6-6 4 4 3-3 5 5"></path></svg><strong>画像を選択してください</strong><span>スクリーンショットを選ぶと軌道線を検出します。</span></div><div class="photoTools" hidden="" id="photoTools"><button id="zoomIn" title="拡大">＋</button><button id="zoomOut" title="縮小">−</button><button id="zoomReset" title="全体表示">⛶</button></div></div>
+<p class="photoHints">検出がずれたら、矢印の位置をタップして指定できます。</p>
 </div></section>
-<section class="panel hidden" id="manualPanel"><h2 class="panel-title">手動設定（距離に連動するプレビュー）</h2><div class="manual-surface"><canvas id="manualCanvas" width="470" height="420" aria-label="角度の大きなプレビュー"></canvas></div><div class="panel-pad"><p class="subtle">0°＝上、90°＝右、180°＝下、270°＝左。なぞり距離を変えるとプレビューの矢印も伸び縮みします。最大距離では表示領域の端まで伸びます。</p><label class="fieldlabel" for="manualRange">角度スライダー</label><input type="range" id="manualRange" min="0" max="360" step="0.001" value="0"></div></section>
-<section class="panel hidden" id="commandsPanel"><h2 class="panel-title">登録コマンドの編集</h2><div class="list" id="commandListLeft"></div><p class="subtle" style="padding:0 14px 12px">「編集」で設定を呼び出して変更し、再度登録できます。</p></section>
+<section class="panel hidden" id="manualPanel"><h2 class="panel-title">角度を手動で設定</h2><div class="manual-surface"><canvas aria-label="角度の大きなプレビュー" height="420" id="manualCanvas" width="470"></canvas></div><div class="panel-pad"><p class="subtle">0°＝上、90°＝右、180°＝下、270°＝左。なぞり距離を変えるとプレビューの矢印も伸び縮みします。最大距離では表示領域の端まで伸びます。</p><label class="fieldlabel" for="manualRange">角度スライダー</label><input id="manualRange" max="360" min="0" step="0.001" type="range" value="0"/></div></section>
+<section class="panel hidden" id="commandsPanel"><h2 class="panel-title">現在ファイルに入れるコマンド（<span id="currentCount">0</span>件）</h2><div class="command-search"><input aria-label="登録コマンドを検索" class="input" id="searchListLeft" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCountLeft">0件</span></div><div class="list command-list-scroll" id="commandListLeft"></div><p class="subtle" style="padding:0 14px 12px">ここにあるコマンドだけを現在の書き出し対象にします。過去のコマンドは「コマンド保管庫」から追加できます。</p></section>
 </div>
 <div class="stack middle">
 <section class="panel"><div class="panel-pad"><h2>軌道線の自動検出</h2>
-<div class="detect-row"><span style="font-size:13px;font-weight:700">◎ 青・赤の矢印からの線を検出</span><label class="toggle"><input id="autoToggle" type="checkbox" checked aria-label="画像読み込み時の自動検出"><span class="track"></span></label></div>
-<div class="source-picker"><label for="arrowSource">基準にする矢印</label><select id="arrowSource"><option value="red" selected>赤い矢印から伸びる線（ピンク系）</option><option value="blue">青い矢印から伸びる線（黄色系）</option><option value="auto">自動で判定（赤・青両方）</option></select><button class="btn" type="button" id="pickArrow">◎ 画像で矢印の位置を1回タップ</button><button class="btn hidden" type="button" id="clearAnchor">位置指定を解除</button><div class="micro" id="arrowHint">画像の読み込み後、赤い矢印から伸びる線を優先します。</div></div><div class="detect-status" id="detectStatus"><span class="status-icon" id="detectIcon">◎</span><div><strong id="detectHeading">画像を待機しています</strong><span id="detectText">画像を選択すると軌道線を解析します。</span></div></div>
-<div id="candidateArea" class="hidden"><div class="subtle">軌道線の候補（線の中心を表示）</div><div class="candidateBtns" id="candidateBtns"></div></div>
-<button class="btn" id="detectAgain" style="width:100%">◎ もう一度検出</button>
+<div class="detect-row"><span style="font-size:13px;font-weight:700">◎ 青・赤の矢印からの線を検出</span><label class="toggle"><input aria-label="画像読み込み時の自動検出" checked="" id="autoToggle" type="checkbox"/><span class="track"></span></label></div>
+<details class="advanced-detect"><summary>検出方法を詳しく設定</summary><div class="source-picker"><label for="arrowSource">基準にする矢印</label><select id="arrowSource"><option selected="" value="red">赤い矢印から伸びる線（ピンク系）</option><option value="blue">青い矢印から伸びる線（黄色系）</option><option value="auto">自動で判定（赤・青両方）</option></select><button class="btn" id="pickArrow" type="button">◎ 画像で矢印の位置を1回タップ</button><button class="btn hidden" id="clearAnchor" type="button">位置指定を解除</button><div class="micro" id="arrowHint">画像の読み込み後、赤い矢印から伸びる線を優先します。</div></div></details><div class="detect-status" id="detectStatus"><span class="status-icon" id="detectIcon">◎</span><div><strong id="detectHeading">画像を選択してください</strong><span id="detectText">選択すると自動で検出します。</span></div></div>
+<div class="hidden" id="candidateArea"><div class="subtle">軌道線の候補（線の中心を表示）</div><div class="candidateBtns" id="candidateBtns"></div></div>
+<button class="btn" id="detectAgain" style="width:100%">再検出する</button>
 </div></section>
 <section class="panel"><div class="panel-pad"><div class="angle-card"><span>計算された角度</span><b id="detectedAngle">—</b></div><div class="two"><button class="btn" id="swapPoints">⇄ 方向を反転</button><button class="btn" id="clearLine">♧ 検出線をリセット</button></div></div></section>
-<section class="panel" id="settingsPanel"><div class="panel-pad"><h2>ジェスチャー設定</h2>
-<label class="fieldlabel" for="name">音声コマンド名</label><input class="input" id="name" value="ゲージショット1" type="text" maxlength="100">
-<div class="angleLine"><label class="fieldlabel" for="angleNumber">角度（°）</label><div class="angle-edit"><button class="btn tiny" id="minusAngle">−</button><input class="input" id="angleNumber" type="number" inputmode="decimal" min="0" max="360" step="0.001" value="0.000"><button class="btn tiny" id="plusAngle">＋</button></div></div>
-<div class="angleLine"><label class="subtle" for="angleStep">微調整幅</label><select id="angleStep"><option value="1">1°</option><option value="0.1">0.1°</option><option value="0.01">0.01°</option><option value="0.001" selected>0.001°</option></select></div>
-<div class="control"><label for="distanceRange">なぞり距離</label><input id="distanceRange" type="range" min="10" max="700" step="1" value="600"><span class="value visually-hidden" id="distanceOut"></span><input class="input small-number" id="distanceDirect" type="number" min="10" max="700" step="1" value="600" inputmode="numeric" aria-label="なぞり距離の数値入力"></div>
-<div class="control"><label for="durationRange">タッチ継続時間</label><input id="durationRange" type="range" min="50" max="5000" step="1" value="500"><span class="value visually-hidden" id="durationOut"></span><input class="input small-number" id="durationDirect" type="number" min="50" max="5000" step="1" value="500" inputmode="numeric" aria-label="タッチ時間の数値入力"></div>
-<div class="control"><label for="delayRange">開始までの待ち時間</label><input id="delayRange" type="range" min="0" max="500" step="10" value="200"><span class="value" id="delayOut">200 ms</span></div>
+<section class="panel" id="settingsPanel"><div class="panel-pad"><h2>コマンドの設定</h2>
+<label class="fieldlabel" for="name">音声コマンド名</label><input class="input" id="name" maxlength="100" type="text" value="ゲージショット1"/>
+<div class="angleLine"><label class="fieldlabel" for="angleNumber">角度（°）</label><div class="angle-edit"><button class="btn tiny" id="minusAngle">−</button><input class="input" id="angleNumber" inputmode="decimal" max="360" min="0" step="0.001" type="number" value="0.000"/><button class="btn tiny" id="plusAngle">＋</button></div></div>
+<div class="angleLine"><label class="subtle" for="angleStep">微調整幅</label><select id="angleStep"><option value="1">1°</option><option value="0.1">0.1°</option><option value="0.01">0.01°</option><option selected="" value="0.001">0.001°</option></select></div>
+<div class="control"><label for="distanceRange">なぞり距離</label><input id="distanceRange" max="700" min="10" step="1" type="range" value="600"/><span class="value visually-hidden" id="distanceOut"></span><input aria-label="なぞり距離の数値入力" class="input small-number" id="distanceDirect" inputmode="numeric" max="700" min="10" step="1" type="number" value="600"/></div>
+<div class="control"><label for="durationRange">タッチ継続時間</label><input id="durationRange" max="5000" min="50" step="1" type="range" value="500"/><span class="value visually-hidden" id="durationOut"></span><input aria-label="タッチ時間の数値入力" class="input small-number" id="durationDirect" inputmode="numeric" max="5000" min="50" step="1" type="number" value="500"/></div>
+<div class="control"><label for="delayRange">開始までの待ち時間</label><input id="delayRange" max="500" min="0" step="10" type="range" value="200"/><span class="value" id="delayOut">200 ms</span></div>
 <div class="angleLine"><label class="fieldlabel" for="direction">なぞる方向</label><select id="direction"><option value="forward">指定した角度</option><option value="reverse">反対向き（180°反転）</option></select></div>
 <details><summary class="subtle" style="cursor:pointer;margin-top:8px">開始座標の詳細設定</summary>
-<div class="control"><label for="xRange">開始 X</label><input id="xRange" type="range" min="0" max="430" value="215"><span class="value" id="xOut">215</span></div>
-<div class="control"><label for="yRange">開始 Y</label><input id="yRange" type="range" min="0" max="1050" value="525"><span class="value" id="yOut">525</span></div></details>
-<button class="btn btn-blue wide" id="addCommand" style="margin-top:14px">＋ コマンドを追加</button>
-<p class="micro">画像からの精度は線の鮮明さによって変わります。</p>
+<div class="control"><label for="xRange">開始 X</label><input id="xRange" max="430" min="0" type="range" value="215"/><span class="value" id="xOut">215</span></div>
+<div class="control"><label for="yRange">開始 Y</label><input id="yRange" max="1050" min="0" type="range" value="525"/><span class="value" id="yOut">525</span></div></details>
+<div class="preset-area">
+<p class="preset-note">注意：スマホサイズ6.1インチ・iOS 27に対応。端末差によってゲージが合わない場合があります。</p>
+<button class="btn preset-button wide" id="gaugePreset" type="button">ゲージ付き <span class="preset-values">時間 450ms ／ 距離 200pt</span></button>
+</div>
+<button class="btn btn-blue wide" id="addCommand" style="margin-top:14px">＋ 現在のコマンドに追加</button><button class="btn wide" id="saveFormToLibrary" style="margin-top:9px">この設定を過去のコマンドに保存</button><p id="formLibraryStatus" class="subtle" aria-live="polite"></p>
+
 </div></section>
 </div>
 <div class="stack right">
-<section class="panel"><h2 class="panel-title">プレビュー（設定した角度の軌道）</h2><div class="preview-wrap"><canvas id="compassCanvas" width="400" height="350" aria-label="方向プレビュー"></canvas><div class="preview-stats"><div class="stat"><small>角度</small><b id="previewAngle">0.000°</b></div><div class="stat"><small>方向</small><p id="previewDirection">まっすぐ上（0°）</p></div><div class="stat"><small>なぞり距離</small><b id="previewDistance">600 pt</b></div></div></div><div class="infoBanner">✓ 距離に合わせてプレビューが変化します。</div></section>
-<section class="panel"><h2 class="panel-title">コマンド一覧（<span id="listCount">0</span>件）</h2><div id="commandList" class="list"><div class="empty-list">まだコマンドがありません。</div></div></section>
-
+<section class="panel"><h2 class="panel-title">プレビュー（設定した角度の軌道）</h2><div class="preview-wrap"><canvas aria-label="方向プレビュー" height="350" id="compassCanvas" width="400"></canvas><div class="preview-stats"><div class="stat"><small>角度</small><b id="previewAngle">0.000°</b></div><div class="stat"><small>方向</small><p id="previewDirection">まっすぐ上（0°）</p></div><div class="stat"><small>なぞり距離</small><b id="previewDistance">600 pt</b></div></div></div></section>
+<section class="panel"><h2 class="panel-title">現在の登録コマンド一覧（<span id="listCount">0</span>件）</h2><div class="bulkbar"><button class="btn bulk-delete" id="clearCurrentCommands" type="button">登録コマンドを一括削除</button></div><div class="command-search"><input aria-label="コマンド一覧を検索" class="input" id="searchList" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCount">0件</span></div><div class="list command-list-scroll" id="commandList"><div class="empty-list">まだコマンドがありません。</div></div></section>
+<section class="panel" id="libraryPanel"><div class="panel-pad"><h2>過去のコマンド保管庫（<span id="libraryCount">0</span>件）</h2><p class="subtle">保管しただけではファイルに追加されません。「＋現在に追加」で書き出し対象に入れられます。</p><input class="input" id="searchLibrary" type="search" placeholder="過去のコマンドを検索" aria-label="過去のコマンドを検索"><div class="list command-list-scroll" id="savedCommandList" style="margin-top:10px;max-height:300px"></div><h2 style="margin-top:18px">保管庫のバックアップ</h2>
+<p class="subtle">過去のコマンドはこの端末に保存されます。JSONファイルへのバックアップもできます。</p>
+<div class="two"><button class="btn btn-blue" id="saveLibrary" type="button">この端末に保存</button><button class="btn" id="backupLibrary" type="button">バックアップを書き出す</button></div>
+<label class="fieldlabel" for="restoreLibrary">バックアップ（JSON）を読み込む</label>
+<input accept=".json,application/json" id="restoreLibrary" style="position:static;opacity:1;width:100%;height:auto;pointer-events:auto;color:#e9f6ff" type="file"/>
+<div aria-live="polite" class="subtle" id="libraryStatus" role="status">保存状態を確認中</div></div></section>
 <section class="panel" id="existingEditorPanel"><div class="panel-pad">
-<h2>既存コマンドの編集</h2>
-<p class="subtle">手書きジェスチャーの形を保ち、タッチ時間・移動距離・始点と終点の順番を変更できます。</p>
+<h2>既存コマンドを編集</h2>
+<p class="subtle">タッチ時間・距離・向き・開始待ち時間を変更できます。角度は直線ジェスチャーのみ編集できます。</p>
 <div id="existingCommands"><span class="subtle">ファイルを選択してください。</span></div>
-<div class="curve-area" id="existingControls" hidden>
+<div class="curve-area" hidden="" id="existingControls">
 <strong id="editingLabel">編集対象</strong>
-<div class="curve-preview"><canvas id="pathCanvas" width="430" height="1050" aria-label="元のジェスチャー軌跡（編集不可）"></canvas>
+<div class="curve-preview"><canvas aria-label="元のジェスチャー軌跡（編集不可）" height="1050" id="pathCanvas" width="430"></canvas>
 <div class="curve-inputs">
 <label class="fieldlabel" for="curveDurationNumber">タッチ時間（ms）</label>
-<div class="numeric-row"><input id="curveDurationNumber" class="input" type="number" inputmode="numeric" min="50" max="5000" step="1" value="500"><span>ms</span></div>
-<input id="curveDuration" type="range" min="50" max="5000" step="1" value="500" aria-label="タッチ時間スライダー">
+<div class="numeric-row"><input class="input" id="curveDurationNumber" inputmode="numeric" max="5000" min="50" step="1" type="number" value="500"/><span>ms</span></div>
+<input aria-label="タッチ時間スライダー" id="curveDuration" max="5000" min="50" step="1" type="range" value="500"/>
 <label class="fieldlabel" for="existingDistanceNumber">なぞり距離（pt）</label>
-<div class="numeric-row"><input id="existingDistanceNumber" class="input" type="number" inputmode="decimal" min="10" max="700" step="0.1" value="100"><span>pt</span></div>
-<input id="existingDistance" type="range" min="10" max="700" step="0.1" value="100" aria-label="なぞり距離スライダー">
+<div class="numeric-row"><input class="input" id="existingDistanceNumber" inputmode="decimal" max="700" min="10" step="0.1" type="number" value="100"/><span>pt</span></div>
+<input aria-label="なぞり距離スライダー" id="existingDistance" max="700" min="10" step="0.1" type="range" value="100"/>
+<label class="fieldlabel" for="existingWaitNumber">開始までの待ち時間（ms）</label>
+<div class="numeric-row"><input class="input" id="existingWaitNumber" inputmode="numeric" max="5000" min="0" step="1" type="number" value="0"/><span>ms</span></div>
+<input aria-label="開始待ち時間スライダー" id="existingWait" max="5000" min="0" step="1" type="range" value="0"/>
+<div id="existingAngleGroup"><label class="fieldlabel" for="existingAngleNumber">角度（°・直線のみ）</label>
+<div class="numeric-row"><input class="input" id="existingAngleNumber" inputmode="decimal" max="360" min="0" step="0.001" type="number" value="0"/><span>°</span></div>
+<input aria-label="既存直線ジェスチャーの角度" id="existingAngleRange" max="360" min="0" step="0.001" type="range" value="0"/>
+</div><p class="micro" id="existingStraightStatus"></p>
 <label class="fieldlabel" for="existingReverse">始点・終点の向き</label>
 <select id="existingReverse"><option value="normal">元の向き（始点 → 終点）</option><option value="reverse">逆向き（終点 → 始点）</option></select>
-<p class="micro" id="existingDistanceOriginal">軌跡の形を保ちながら拡大・縮小します。</p>
-<button id="curveApply" type="button" class="btn btn-blue wide">このコマンドの変更を保存</button>
-<button id="resetExisting" type="button" class="btn">変更を取り消す</button>
+<p class="micro" id="existingDistanceOriginal">軌跡の形を保ちながら拡大・縮小します。</p><p class="micro">※ 待ち時間はアーカイブ内のイベント時刻を後ろにずらして設定します。iOSでの待機再現は未検証です。</p>
+<button class="btn btn-blue wide" id="curveApply" type="button">このコマンドの変更を保存</button>
+<button class="btn" id="resetExisting" type="button">変更を取り消す</button>
 </div></div>
-<div id="editorStatus" role="status" class="subtle"></div>
+<div class="subtle" id="editorStatus" role="status"></div>
 </div></div></section>
-<section class="green-section"><div class="exportSub"><strong style="font-size:15px">元の音声コントロールファイルを読み込む</strong><span class="source-help">.voicecontrolcommands ファイルを選んでください。</span><input type="file" id="sourceFile" aria-label="元の.voicecontrolcommandsを選択"><span class="fileStatus" id="sourceName">元のファイル：未選択</span><div id="sourceReadStatus" role="status" aria-live="polite">読み込み待ち：まだファイルを選択していません。</div><strong style="font-size:15px;margin-top:10px">編集内容と新規コマンドをまとめて保存</strong><button class="btn btn-green wide" id="generate">↓ まとめて保存<br><span style="font-size:13px">（.voicecontrolcommands）</span></button><div class="exportlog" id="exportStatus"></div></div></section>
+<section class="green-section"><div class="exportSub"><strong style="font-size:15px">元の音声コントロールファイルを読み込む</strong><span class="source-help">.voicecontrolcommands ファイルを選んでください。</span><input aria-label="元の.voicecontrolcommandsを選択" id="sourceFile" type="file"/><span class="fileStatus" id="sourceName">元のファイル：未選択</span><div aria-live="polite" id="sourceReadStatus" role="status">読み込み待ち：まだファイルを選択していません。</div><strong style="font-size:15px;margin-top:10px">既存ファイルの内容と「現在のコマンド」だけを保存</strong><button class="btn btn-green wide" id="generate">↓ まとめて保存<br/><span style="font-size:13px">（.voicecontrolcommands）</span></button><div class="exportlog" id="exportStatus"></div></div></section>
 </div></div>
-
 </main>
 <script>
 const TEMPLATE = {"$version":100000,"$archiver":"NSKeyedArchiver","$top":{"root":{"__uid":1}},"$objects":["$null",{"$class":{"__uid":138},"AllEvents":{"__uid":2},"Version":{"__uid":137},"ArePointsDeviceRelative":false},{"NS.objects":[{"__uid":3},{"__uid":17},{"__uid":24},{"__uid":30},{"__uid":36},{"__uid":42},{"__uid":48},{"__uid":54},{"__uid":60},{"__uid":66},{"__uid":72},{"__uid":78},{"__uid":84},{"__uid":90},{"__uid":96},{"__uid":102},{"__uid":108},{"__uid":114},{"__uid":120},{"__uid":126},{"__uid":132}],"$class":{"__uid":136}},{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":7},{"__uid":13},{"__uid":15}],"$class":{"__uid":16}},"Fingers","Forces","Time",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":9}],"$class":{"__uid":12}},1,{"NS.pointval":{"__uid":10},"$class":{"__uid":11},"NS.special":1},"{175.66666666666666, 427}",{"$classname":"NSValue","$classes":["NSValue","NSObject"]},{"$classname":"NSMutableDictionary","$classes":["NSMutableDictionary","NSDictionary","NSObject"]},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":14}],"$class":{"__uid":12}},0.0,812959975.812581,{"$classname":"NSDictionary","$classes":["NSDictionary","NSObject"]},{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":18},{"__uid":21},{"__uid":23}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":19}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":20},"$class":{"__uid":11},"NS.special":1},"{175.66666666666666, 427}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},1.0,812959975.813017,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":25},{"__uid":28},{"__uid":29}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":26}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":27},"$class":{"__uid":11},"NS.special":1},"{168, 436.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.863868,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":31},{"__uid":34},{"__uid":35}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":32}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":33},"$class":{"__uid":11},"NS.special":1},"{165, 440.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.876084,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":37},{"__uid":40},{"__uid":41}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":38}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":39},"$class":{"__uid":11},"NS.special":1},"{161, 444.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.893067,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":43},{"__uid":46},{"__uid":47}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":44}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":45},"$class":{"__uid":11},"NS.special":1},"{157.66666666666666, 449}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.909464,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":49},{"__uid":52},{"__uid":53}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":50}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":51},"$class":{"__uid":11},"NS.special":1},"{154, 453}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.926036,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":55},{"__uid":58},{"__uid":59}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":56}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":57},"$class":{"__uid":11},"NS.special":1},"{150.33333333333331, 457.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.942622,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":61},{"__uid":64},{"__uid":65}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":62}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":63},"$class":{"__uid":11},"NS.special":1},"{146.66666666666666, 461.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.979808,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":67},{"__uid":70},{"__uid":71}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":68}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":69},"$class":{"__uid":11},"NS.special":1},"{143.33333333333331, 465.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959975.997102,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":73},{"__uid":76},{"__uid":77}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":74}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":75},"$class":{"__uid":11},"NS.special":1},"{139.33333333333331, 470}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.013734,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":79},{"__uid":82},{"__uid":83}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":80}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":81},"$class":{"__uid":11},"NS.special":1},"{135.66666666666666, 475}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.030376,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":85},{"__uid":88},{"__uid":89}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":86}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":87},"$class":{"__uid":11},"NS.special":1},"{131.66666666666666, 479.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.042667,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":91},{"__uid":94},{"__uid":95}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":92}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":93},"$class":{"__uid":11},"NS.special":1},"{128.33333333333331, 483.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.059288,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":97},{"__uid":100},{"__uid":101}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":98}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":99},"$class":{"__uid":11},"NS.special":1},"{125.33333333333333, 487}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.075917,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":103},{"__uid":106},{"__uid":107}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":104}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":105},"$class":{"__uid":11},"NS.special":1},"{122.66666666666666, 489.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.092614,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":109},{"__uid":112},{"__uid":113}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":110}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":111},"$class":{"__uid":11},"NS.special":1},"{120.66666666666666, 491.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.109201,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":115},{"__uid":118},{"__uid":119}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":116}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":117},"$class":{"__uid":11},"NS.special":1},"{120, 492.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.145799,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":121},{"__uid":124},{"__uid":125}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":122}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":123},"$class":{"__uid":11},"NS.special":1},"{119.66666666666666, 492.66666666666663}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.163673,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":127},{"__uid":130},{"__uid":131}],"$class":{"__uid":16}},{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":128}],"$class":{"__uid":12}},{"NS.pointval":{"__uid":129},"$class":{"__uid":11},"NS.special":1},"{119.66666666666666, 492.33333333333331}",{"NS.keys":[{"__uid":8}],"NS.objects":[{"__uid":22}],"$class":{"__uid":12}},812959976.292552,{"NS.keys":[{"__uid":4},{"__uid":5},{"__uid":6}],"NS.objects":[{"__uid":133},{"__uid":134},{"__uid":135}],"$class":{"__uid":16}},{"NS.keys":[],"NS.objects":[],"$class":{"__uid":12}},{"NS.keys":[],"NS.objects":[],"$class":{"__uid":12}},812959976.292835,{"$classname":"NSMutableArray","$classes":["NSMutableArray","NSArray","NSObject"]},1,{"$classname":"AXMutableReplayableGesture","$classes":["AXMutableReplayableGesture","AXReplayableGesture","NSObject"]}]};
@@ -187,7 +306,7 @@ function encode64(a){let parts=[];for(let i=0;i<a.length;i+=0x6000)parts.push(St
 
 // UI and detector
 const $=id=>document.getElementById(id);
-const state={angle:0,image:null,imageName:'',lines:[],lineIndex:-1,mode:'image',zoom:1,commands:[],lastUrl:null,arrowAnchor:null,pickingArrow:false,runId:0};
+const state={angle:0,image:null,imageName:'',lines:[],lineIndex:-1,mode:'image',zoom:1,commands:[],library:[],lastUrl:null,arrowAnchor:null,pickingArrow:false,runId:0};
 const photoCanvas=$('photoCanvas'),photoCtx=photoCanvas.getContext('2d');
 const pad=(n)=>String(n).padStart(2,'0');
 function formatAngle(a){return a.toFixed(3)+'°'}
@@ -224,6 +343,14 @@ for(const kind of ['distance','duration']){
  field.addEventListener('input',()=>{const v=Number(field.value);if(field.value!==''&&Number.isFinite(v)&&v>=min&&v<=max){range.value=v;range.dispatchEvent(new Event('input'))}});
  field.addEventListener('change',()=>{const v=Number(field.value);const n=field.value!==''&&Number.isFinite(v)?Math.max(min,Math.min(max,v)):Number(range.value);range.value=n;range.dispatchEvent(new Event('input'))});
 }
+// ゲージ付き設定：表示と実際の書き出し設定を同時に更新する。
+$('gaugePreset').addEventListener('click',()=>{
+ for(const [kind,value] of [['duration',450],['distance',200]]){
+  const input=$(kind+'Range');input.value=String(value);
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+ }
+ $('formLibraryStatus').textContent='ゲージ付き：タッチ時間450ms・なぞり距離200ptに設定しました。';
+});
 // The preview vector length is proportional to the distance slider.
 // The touch-start marker stays fixed, and only the arrow tip moves.
 // The canvas is a normalized preview, not a 1:1 reproduction of device points.
@@ -512,9 +639,63 @@ photoCanvas.addEventListener('click',e=>{if(!state.image)return;const rect=photo
 });
 function getSettings(){const a=currentAngle()*Math.PI/180,d=Number($('distanceRange').value),x=Number($('xRange').value),y=Number($('yRange').value);return {x,y,ex:x+Math.sin(a)*d,ey:y-Math.cos(a)*d,dur:Number($('durationRange').value),wait:Number($('delayRange').value)}}
 function readCommand(){const name=$('name').value.trim();if(!name)throw Error('音声コマンド名を入力してください');return {name,angle:state.angle,direction:$('direction').value,s:getSettings()}}
-function renderCommands(){for(const id of ['commandList','commandListLeft']){$(id).replaceChildren();if(!state.commands.length){const e=document.createElement('div');e.className='empty-list';e.textContent='まだコマンドがありません。';$(id).append(e)}for(let i=0;i<state.commands.length;i++){
- const item=state.commands[i],entry=document.createElement('div'),info=document.createElement('div'),title=document.createElement('b'),details=document.createElement('p'),actions=document.createElement('div'),edit=document.createElement('button'),del=document.createElement('button');entry.className='item';info.className='contents';title.textContent='▶ '+item.name;details.textContent='角度: '+formatAngle(normalizeAngle(item.angle+(item.direction==='reverse'?180:0)))+'　距離: '+Math.round(Math.hypot(item.s.ex-item.s.x,item.s.ey-item.s.y))+'pt　タッチ: '+item.s.dur+'ms　待機: '+item.s.wait+'ms';info.append(title,details);actions.className='itemactions';edit.className=del.className='iconBtn';edit.textContent='編集';del.textContent='削除';edit.addEventListener('click',()=>{$('name').value=item.name;setAngle(item.angle);$('direction').value=item.direction;for(const [id,v] of [['distance',Math.round(Math.hypot(item.s.ex-item.s.x,item.s.ey-item.s.y))],['duration',item.s.dur],['delay',item.s.wait],['x',item.s.x],['y',item.s.y]]){$(id+'Range').value=v;$(id+'Range').dispatchEvent(new Event('input'))}setAngle(item.angle);state.commands.splice(i,1);renderCommands();setMode('manual')});del.addEventListener('click',()=>{state.commands.splice(i,1);renderCommands()});actions.append(edit,del);entry.append(info,actions);$(id).append(entry)}}$('listCount').textContent=state.commands.length}
-$('addCommand').addEventListener('click',()=>{try{const item=readCommand();state.commands.push(item);renderCommands();$('exportStatus').textContent='「'+item.name+'」を追加しました。'}catch(e){$('exportStatus').textContent='エラー: '+e.message}});
+let editingLibraryIndex=null;
+const cloneCommand=v=>JSON.parse(JSON.stringify(v));
+function commandDetails(item){return '角度: '+formatAngle(normalizeAngle(item.angle+(item.direction==='reverse'?180:0)))+'　距離: '+Math.round(Math.hypot(item.s.ex-item.s.x,item.s.ey-item.s.y))+'pt　タッチ: '+item.s.dur+'ms　待機: '+item.s.wait+'ms'}
+function loadForm(item){
+ $('name').value=item.name;$('direction').value=item.direction;
+ for(const [key,v] of [['distance',Math.round(Math.hypot(item.s.ex-item.s.x,item.s.ey-item.s.y))],['duration',item.s.dur],['delay',item.s.wait],['x',item.s.x],['y',item.s.y]]){
+  $(key+'Range').value=v;$(key+'Range').dispatchEvent(new Event('input'));
+ }
+ setAngle(item.angle);setMode('manual');
+}
+function makeEntry(item,actions){
+ const row=document.createElement('div'),txt=document.createElement('div'),title=document.createElement('b'),details=document.createElement('p'),buttons=document.createElement('div');
+ row.className='item';txt.className='contents';title.textContent='▶ '+item.name;details.textContent=commandDetails(item);txt.append(title,details);buttons.className='itemactions';
+ actions.forEach(([label,fn])=>{const btn=document.createElement('button');btn.className='iconBtn';btn.textContent=label;btn.addEventListener('click',fn);buttons.append(btn)});
+ row.append(txt,buttons);return row;
+}
+function renderCommands(){
+ for(const [id,searchId,countId] of [['commandList','searchList','searchCount'],['commandListLeft','searchListLeft','searchCountLeft']]){
+  const box=$(id),query=($(searchId)?.value||'').trim().toLocaleLowerCase('ja-JP');box.replaceChildren();let displayed=0;
+  state.commands.forEach((item,i)=>{
+   if(query&&!item.name.toLocaleLowerCase('ja-JP').includes(query))return;displayed++;
+   box.append(makeEntry(item,[
+    ['編集',()=>{editingLibraryIndex=null;$('saveFormToLibrary').textContent='この設定を過去のコマンドに保存';loadForm(item);state.commands.splice(i,1);renderCommands();$('formLibraryStatus').textContent='現在のコマンドを編集中です。変更後「＋現在のコマンドに追加」を押してください。'}],
+    ['保管庫に保存',()=>{state.library.push(cloneCommand(item));renderLibrary();saveCommands();$('libraryStatus').textContent='「'+item.name+'」を過去のコマンドに保管しました。'}],
+    ['削除',()=>{state.commands.splice(i,1);renderCommands()}]
+   ]));
+  });
+  if(!displayed){const e=document.createElement('div');e.className='empty-list';e.textContent=state.commands.length?'一致するコマンドがありません。':'現在のコマンドはまだありません。';box.append(e)}
+  if($(countId))$(countId).textContent=displayed+'件';
+ }
+ $('listCount').textContent=state.commands.length;$('currentCount').textContent=state.commands.length;$('clearCurrentCommands').disabled=state.commands.length===0;
+ if(window.__libraryLoaded)saveCommands();
+}
+function renderLibrary(){
+ const box=$('savedCommandList'),query=$('searchLibrary').value.trim().toLocaleLowerCase('ja-JP');box.replaceChildren();let visible=0;
+ state.library.forEach((item,i)=>{
+  if(query&&!item.name.toLocaleLowerCase('ja-JP').includes(query))return;visible++;
+  box.append(makeEntry(item,[
+   ['＋現在に追加',()=>{state.commands.push(cloneCommand(item));renderCommands();$('libraryStatus').textContent='「'+item.name+'」を現在のコマンドに追加しました。'}],
+   ['編集',()=>{editingLibraryIndex=i;loadForm(item);$('saveFormToLibrary').textContent='保管庫の変更を上書き保存';$('formLibraryStatus').textContent='保管庫の「'+item.name+'」を編集中。「この設定を過去のコマンドに保存」で上書きします。'}],
+   ['削除',()=>{if(!confirm('保管庫から「'+item.name+'」を削除しますか？'))return;state.library.splice(i,1);if(editingLibraryIndex===i)editingLibraryIndex=null;renderLibrary();saveCommands()}]
+  ]));
+ });
+ if(!visible){const e=document.createElement('div');e.className='empty-list';e.textContent=state.library.length?'一致するコマンドがありません。':'過去のコマンドはまだありません。';box.append(e)}
+ $('libraryCount').textContent=state.library.length;
+}
+for(const id of ['searchList','searchListLeft'])$(id).addEventListener('input',renderCommands);
+$('searchLibrary').addEventListener('input',renderLibrary);
+$('clearCurrentCommands').addEventListener('click',()=>{
+ const count=state.commands.length;
+ if(!count)return;
+ if(!confirm('現在の登録コマンド '+count+'件をすべて削除しますか？\n過去のコマンド保管庫と読み込んだ元ファイルは削除されません。'))return;
+ state.commands.length=0;renderCommands();
+ $('exportStatus').textContent='現在の登録コマンドをすべて削除しました。保管庫のコマンドは残っています。';
+});
+$('addCommand').addEventListener('click',()=>{try{const item=readCommand();state.commands.push(item);renderCommands();$('formLibraryStatus').textContent='「'+item.name+'」を現在のコマンドに追加しました。';$('exportStatus').textContent='現在の書き出し対象：'+state.commands.length+'件'}catch(e){$('formLibraryStatus').textContent='エラー: '+e.message}});
+$('saveFormToLibrary').addEventListener('click',()=>{try{const item=readCommand();if(editingLibraryIndex!==null&&editingLibraryIndex<state.library.length){state.library[editingLibraryIndex]=cloneCommand(item);$('formLibraryStatus').textContent='保管庫の「'+item.name+'」を上書き保存しました。'}else{state.library.push(cloneCommand(item));$('formLibraryStatus').textContent='「'+item.name+'」を保管庫に保存しました。'}editingLibraryIndex=null;$('saveFormToLibrary').textContent='この設定を過去のコマンドに保存';renderLibrary();saveCommands();}catch(e){$('formLibraryStatus').textContent='エラー: '+e.message}});
 // The iPhone Files picker may hide custom extensions when accept= is specified.
 // Selection is unrestricted. XML plist and binary plist can both be imported.
 let importedSource=null;
@@ -618,6 +799,66 @@ $('sourceFile').addEventListener('change',async()=>{
 // Original commands are edited in place in the freshly cloned source XML.
 // Unmodified commands retain their exact original CustomGesture data.
 const originalEdits=new Map();
+let selectedStraight=false,selectedBaseAngle=0;
+const LIBRARY_KEY='monst-gesture-v1-created-commands'; // Legacy key: previous versions used this for all saved commands.
+const NEW_LIBRARY_KEY='monst-gesture-v1-history-v2';
+const DRAFT_KEY='monst-gesture-v1-current-export-v2';
+function validateSavedCommand(v){
+ if(!v||typeof v.name!=='string'||!v.name.trim()||v.name.length>100||!v.s||!Number.isFinite(v.angle))return false;
+ return ['x','y','ex','ey','dur','wait'].every(k=>Number.isFinite(v.s[k]))&&v.s.dur>=50&&v.s.dur<=5000&&v.s.wait>=0&&v.s.wait<=5000&&v.direction!==undefined;
+}
+function parseSaved(raw){if(!raw)return [];const v=JSON.parse(raw);if(!Array.isArray(v.commands)||v.commands.length>2000||!v.commands.every(validateSavedCommand))throw Error('保存データの形式が不正です');return v.commands}
+function saveCommands(){
+ try{
+  localStorage.setItem(NEW_LIBRARY_KEY,JSON.stringify({format:'monst-gesture-library',version:2,commands:state.library}));
+  localStorage.setItem(DRAFT_KEY,JSON.stringify({format:'monst-gesture-current',version:2,commands:state.commands}));
+  $('libraryStatus').textContent='保管庫：'+state.library.length+'件 / 現在：'+state.commands.length+'件（このブラウザに保存済み）';return true;
+ }catch(e){$('libraryStatus').textContent='保存できませんでした：'+e.message;return false}
+}
+function restoreLocalCommands(){
+ try{
+  const history=localStorage.getItem(NEW_LIBRARY_KEY);
+  if(history){state.library=parseSaved(history)}
+  else{
+   const legacy=localStorage.getItem(LIBRARY_KEY);
+   if(legacy){state.library=parseSaved(legacy);$('libraryStatus').textContent='以前の版のコマンドを保管庫へ移しました。'}
+  }
+  // Legacy commands are intentionally NOT part of current export.
+  state.commands=parseSaved(localStorage.getItem(DRAFT_KEY));
+  renderLibrary();renderCommands();saveCommands();
+ }catch(e){$('libraryStatus').textContent='保存データを読み込めません：'+e.message}
+}
+$('saveLibrary').addEventListener('click',()=>saveCommands());
+$('backupLibrary').addEventListener('click',()=>{
+ const data={format:'monst-gesture-library',version:2,commands:state.library},blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='モンスト_過去のコマンド保管庫.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+ $('libraryStatus').textContent='保管庫のバックアップを書き出しました（'+state.library.length+'件）。現在のコマンドは含みません。';
+});
+$('restoreLibrary').addEventListener('change',async()=>{
+ const f=$('restoreLibrary').files[0];if(!f)return;
+ try{if(f.size>4e6)throw Error('ファイルが大きすぎます');const data=JSON.parse(await f.text());
+ if(data.format!=='monst-gesture-library'||!Array.isArray(data.commands)||data.commands.length>2000||!data.commands.every(validateSavedCommand))throw Error('対応していないバックアップです');
+ if(state.library.length&&!confirm('過去のコマンド保管庫をバックアップの内容で置き換えますか？ ※現在のコマンドは維持されます。'))return;
+ state.library=data.commands.map(cloneCommand);editingLibraryIndex=null;renderLibrary();saveCommands();$('libraryStatus').textContent='保管庫に'+data.commands.length+'件を復元しました。現在のコマンドは変更していません。';
+ }catch(e){$('libraryStatus').textContent='読み込みエラー：'+e.message}finally{$('restoreLibrary').value=''}
+});
+function straightAnalysis(path){
+ const a=path[0],b=path[path.length-1],dx=b.x-a.x,dy=b.y-a.y,chord=Math.hypot(dx,dy),total=pathLength(path);
+ if(chord<2||total<2)return {straight:false,angle:0};
+ let maxDeviation=0,maxBackward=0;
+ for(let i=1;i<path.length;i++){
+  const p=path[i],cross=Math.abs(dx*(p.y-a.y)-dy*(p.x-a.x))/chord;
+  maxDeviation=Math.max(maxDeviation,cross);
+  const segment=path[i].x-path[i-1].x,segmentY=path[i].y-path[i-1].y;
+  maxBackward+=Math.max(0,-(segment*dx+segmentY*dy)/chord);
+ }
+ const straight=maxDeviation<=Math.max(2.5,chord*.02)&&total/chord<=1.04&&maxBackward<=Math.max(1.5,chord*.015);
+ return {straight,angle:(Math.atan2(dx,-dy)*180/Math.PI+360)%360,maxDeviation,total,chord};
+}
+function rotateExistingPath(path,targetAngle){
+ const p0=path[0],last=path[path.length-1],base=Math.atan2(last.x-p0.x,-(last.y-p0.y)),delta=targetAngle*Math.PI/180-base,c=Math.cos(delta),s=Math.sin(delta);
+ return path.map(p=>{const dx=p.x-p0.x,dy=p.y-p0.y;return {x:p0.x+dx*c-dy*s,y:p0.y+dx*s+dy*c}});
+}
+
 let existingRecords=[],selectedExistingKey=null,selectedOriginalPath=null,currentCurve=null;
 let originalLength=0,originalDuration=500;
 const pathCanvas=$('pathCanvas'),pathCtx=pathCanvas.getContext('2d');
@@ -669,7 +910,7 @@ function samplePath(path,n){
   points.push({x:path[j-1].x+(path[j].x-path[j-1].x)*ratio,y:path[j-1].y+(path[j].y-path[j-1].y)*ratio});
  }return points;
 }
-function modifyArchive(arch,path,requestedDuration){
+function modifyArchive(arch,path,requestedDuration,extraWait=0){
  const copy=JSON.parse(JSON.stringify(arch)),events=eventFields(copy),positions=events.filter(e=>e.pointId!==null&&e.point);
  const sampled=path.length===positions.length?path:samplePath(path,positions.length);
  positions.forEach((e,i)=>{copy.$objects[e.pointId]=`{${sampled[i].x.toFixed(4)}, ${sampled[i].y.toFixed(4)}}`});
@@ -677,6 +918,7 @@ function modifyArchive(arch,path,requestedDuration){
   const times=events.filter(e=>Number.isFinite(e.time));const t0=times[0]?.time??0,tLast=times.at(-1)?.time??t0;
   if(tLast>t0){for(const e of times)copy.$objects[e.timeId]=t0+(e.time-t0)/(tLast-t0)*requestedDuration/1000;}
  }
+ if(extraWait){for(const e of events.filter(e=>Number.isFinite(e.time)))copy.$objects[e.timeId]+=extraWait/1000;}
  return bplist(copy);
 }
 function drawCurve(){
@@ -697,15 +939,18 @@ function curveMessage(msg){$('editorStatus').textContent=msg}
 function selectedCurve(path){currentCurve=path.map(p=>({x:p.x,y:p.y}));drawCurve()}
 function pathLength(path){let d=0;for(let i=1;i<path.length;i++)d+=Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y);return d}
 function rescalePath(path,length){const old=pathLength(path);if(old<.01)throw Error('距離が短すぎるジェスチャーです');const k=length/old,base=path[0];return path.map(p=>({x:base.x+(p.x-base.x)*k,y:base.y+(p.y-base.y)*k}))}
-function existingEditedPath(path,distance,reversed){
+function existingEditedPath(path,distance,reversed,rotationAngle=null){
  const base=reversed?[...path].reverse():path;
- return rescalePath(base,distance);
+ const scaled=rescalePath(base,distance);
+ return rotationAngle===null?scaled:rotateExistingPath(scaled,rotationAngle);
 }
 function updateExistingPreview(){
  if(!selectedOriginalPath)return;
  const d=Number($('existingDistanceNumber').value);
  if(!Number.isFinite(d)||d<10||d>700)return;
- selectedCurve(existingEditedPath(selectedOriginalPath,d,$('existingReverse').value==='reverse'));
+ const a=selectedStraight?Number($('existingAngleNumber').value):null;
+ if(selectedStraight&&(!Number.isFinite(a)||a<0||a>360))return;
+ selectedCurve(existingEditedPath(selectedOriginalPath,d,$('existingReverse').value==='reverse',a));
 }
 function linkExistingControls(rangeId,numberId,min,max){
  const range=$(rangeId),field=$(numberId);
@@ -722,7 +967,9 @@ function linkExistingControls(rangeId,numberId,min,max){
 }
 linkExistingControls('existingDistance','existingDistanceNumber',10,700);
 linkExistingControls('curveDuration','curveDurationNumber',50,5000);
-$('existingReverse').addEventListener('change',updateExistingPreview);
+linkExistingControls('existingWait','existingWaitNumber',0,5000);
+linkExistingControls('existingAngleRange','existingAngleNumber',0,360);
+$('existingReverse').addEventListener('change',()=>{if(selectedStraight){const value=Number($('existingAngleNumber').value);if(Number.isFinite(value)){const a=(value+180)%360;$('existingAngleNumber').value=a.toFixed(3);$('existingAngleRange').value=a;}}updateExistingPreview()});
 $('resetExisting').addEventListener('click',()=>{if(!selectedExistingKey)return;const record=existingRecords.find(x=>x.key===selectedExistingKey);originalEdits.delete(selectedExistingKey);selectExisting(record);curveMessage('このコマンドの変更を取り消しました。')});
 function populateExisting(){
  const host=$('existingCommands');host.replaceChildren();existingRecords=[];selectedExistingKey=null;selectedOriginalPath=null;$('existingControls').hidden=true;
@@ -753,6 +1000,12 @@ function selectExisting(record){
   if(!record.data)throw Error('このコマンドには編集できるジェスチャーがありません。');
   const orig=extractArchiveData(record.data);selectedOriginalPath=orig.path;
   originalLength=pathLength(orig.path);originalDuration=orig.duration;
+ const straight=straightAnalysis(orig.path);selectedStraight=straight.straight;selectedBaseAngle=straight.angle;
+ $('existingAngleGroup').hidden=!selectedStraight;
+ $('existingStraightStatus').textContent=selectedStraight?'直線ジェスチャー：角度を編集できます。':'曲線ジェスチャー：角度編集はできません。';
+ const angleValue=edit?.angle??((straight.angle+(edit?.reverse?180:0))%360);
+ $('existingAngleRange').value=angleValue;$('existingAngleNumber').value=Number(angleValue).toFixed(3);
+ $('existingWait').value=edit?.wait??0;$('existingWaitNumber').value=edit?.wait??0;
   if(!Number.isFinite(originalLength)||originalLength<1)throw Error('軌跡の距離を計算できません');
   const currentDistance=edit?.distance??originalLength;
   const distanceValue=Math.min(700,Math.max(10,Math.round(currentDistance*10)/10));
@@ -776,9 +1029,12 @@ $('curveApply').addEventListener('click',()=>{try{
  if(!Number.isFinite(distance)||distance<10||distance>700)throw Error('なぞり距離は10〜700 ptで入力してください');
  if(!Number.isFinite(duration)||duration<50||duration>5000)throw Error('タッチ時間は50〜5000 msで入力してください');
  const reverse=$('existingReverse').value==='reverse';
- originalEdits.set(selectedExistingKey,{distance,duration,reverse});
+ const wait=Number($('existingWaitNumber').value),angle=selectedStraight?Number($('existingAngleNumber').value):null;
+ if(!Number.isFinite(wait)||wait<0||wait>5000)throw Error('開始待ち時間は0〜5000msで入力してください');
+ if(selectedStraight&&(!Number.isFinite(angle)||angle<0||angle>360))throw Error('角度は0〜360°で入力してください');
+ originalEdits.set(selectedExistingKey,{distance,duration,reverse,wait,angle});
  const item=existingRecords.find(x=>x.key===selectedExistingKey);
- curveMessage('「'+item.name+'」の時間と距離の変更を登録しました。最後に「まとめて保存」を押してください。');
+ curveMessage('「'+item.name+'」の変更を登録しました。最後に「まとめて保存」を押してください。');
  for(const row of $('existingCommands').querySelectorAll('.existing-item')){const button=row.querySelector('button');if(button?.dataset.key===selectedExistingKey){row.querySelector('small').textContent='変更あり';}}
  }catch(e){curveMessage('エラー：'+e.message)}
 });
@@ -807,8 +1063,10 @@ $('generate').addEventListener('click',async()=>{try{
    if(edit.distance!==null||edit.duration!==null){
     if(!data)throw Error('編集対象「'+id+'」にジェスチャーがありません。');
     const archived=extractArchiveData(data);
-    const scaled=existingEditedPath(archived.path,edit.distance??pathLength(archived.path),!!edit.reverse);
-    const bytes=modifyArchive(archived.arch,scaled,edit.duration);
+    const classification=straightAnalysis(archived.path);
+    if(edit.angle!==null&&edit.angle!==undefined&&!classification.straight)throw Error('曲線の角度は編集できません：'+id);
+    const scaled=existingEditedPath(archived.path,edit.distance??pathLength(archived.path),!!edit.reverse,classification.straight?edit.angle:null);
+    const bytes=modifyArchive(archived.arch,scaled,edit.duration,edit.wait??0);
     data.textContent='\n'+encode64(bytes).replace(/.{1,68}/g,'$&\n');
    }
   }
@@ -831,5 +1089,20 @@ $('generate').addEventListener('click',async()=>{try{
  }catch(e){$('exportStatus').textContent='エラー：'+e.message;console.error(e)}
 });
 // First load: deliberately show no image.
-renderCommands();setMode("image");setAngle(0);showPhoto();drawCompass();drawManual();
+restoreLocalCommands();window.__libraryLoaded=true;renderCommands();setMode("image");setAngle(0);showPhoto();drawCompass();drawManual();
+</script><script>
+(()=>{
+ const b=document.getElementById('quickManage');
+ b.addEventListener('click',()=>document.querySelector('.tab[data-tab="commands"]').click());
+ function refreshQuick(){
+  const page=document.body.dataset.page||'image';
+  const label=document.querySelector('.quicktext');
+  const labels={image:'画像を選択 → 軌道線を確認 → コマンドを登録',manual:'角度・時間・距離を入力 → コマンドを登録',commands:'現在の一覧・過去の保管庫・ファイル出力',existing:'ファイルを選択 → 既存コマンドを編集 → 出力'};
+  label.textContent=labels[page]||labels.image;
+  b.style.display=page==='commands'?'none':'';
+ }
+ document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',refreshQuick));
+ new MutationObserver(refreshQuick).observe(document.body,{attributes:true,attributeFilter:['data-page']});
+ refreshQuick();
+})();
 </script></body></html>

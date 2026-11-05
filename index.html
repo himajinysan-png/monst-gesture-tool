@@ -92,6 +92,8 @@ body[data-page="commands"] #commandListLeft{max-height:460px}
 .bulkbar{display:flex;justify-content:flex-end;padding:7px 13px 0}
 .bulk-delete{border-color:#b66a75;color:#ffd5dc;background:#472732;font-size:13px;padding:8px 11px}
 .bulk-delete:hover{background:#65303c}
+#commandsPanel .bulkbar{padding:0 13px 12px;justify-content:flex-end}
+@media(max-width:690px){#commandsPanel .bulkbar{padding:0 12px 12px}#commandsPanel .bulk-delete{width:100%}}
 .bulk-delete:disabled{opacity:.45;cursor:not-allowed}
 </style><style>
 /* UI v1.0: compact four-screen layout; keep all existing controls and code */
@@ -193,7 +195,7 @@ body[data-page=existing] .stack.right{grid-column:1}
 <p class="photoHints">検出がずれたら、矢印の位置をタップして指定できます。</p>
 </div></section>
 <section class="panel hidden" id="manualPanel"><h2 class="panel-title">角度を手動で設定</h2><div class="manual-surface"><canvas aria-label="角度の大きなプレビュー" height="420" id="manualCanvas" width="470"></canvas></div><div class="panel-pad"><p class="subtle">0°＝上、90°＝右、180°＝下、270°＝左。なぞり距離を変えるとプレビューの矢印も伸び縮みします。最大距離では表示領域の端まで伸びます。</p><label class="fieldlabel" for="manualRange">角度スライダー</label><input id="manualRange" max="360" min="0" step="0.001" type="range" value="0"/></div></section>
-<section class="panel hidden" id="commandsPanel"><h2 class="panel-title">現在ファイルに入れるコマンド（<span id="currentCount">0</span>件）</h2><div class="command-search"><input aria-label="登録コマンドを検索" class="input" id="searchListLeft" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCountLeft">0件</span></div><div class="list command-list-scroll" id="commandListLeft"></div><p class="subtle" style="padding:0 14px 12px">ここにあるコマンドだけを現在の書き出し対象にします。過去のコマンドは「コマンド保管庫」から追加できます。</p></section>
+<section class="panel hidden" id="commandsPanel"><h2 class="panel-title">現在ファイルに入れるコマンド（<span id="currentCount">0</span>件）</h2><div class="bulkbar"><button class="btn bulk-delete" id="clearCurrentCommands" type="button" disabled>登録コマンドを一括削除</button></div><div class="command-search"><input aria-label="登録コマンドを検索" class="input" id="searchListLeft" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCountLeft">0件</span></div><div class="list command-list-scroll" id="commandListLeft"></div><p class="subtle" style="padding:0 14px 12px">ここにあるコマンドだけを現在の書き出し対象にします。過去のコマンドは「コマンド保管庫」から追加できます。</p></section>
 </div>
 <div class="stack middle">
 <section class="panel"><div class="panel-pad"><h2>軌道線の自動検出</h2>
@@ -224,7 +226,7 @@ body[data-page=existing] .stack.right{grid-column:1}
 </div>
 <div class="stack right">
 <section class="panel"><h2 class="panel-title">プレビュー（設定した角度の軌道）</h2><div class="preview-wrap"><canvas aria-label="方向プレビュー" height="350" id="compassCanvas" width="400"></canvas><div class="preview-stats"><div class="stat"><small>角度</small><b id="previewAngle">0.000°</b></div><div class="stat"><small>方向</small><p id="previewDirection">まっすぐ上（0°）</p></div><div class="stat"><small>なぞり距離</small><b id="previewDistance">600 pt</b></div></div></div></section>
-<section class="panel"><h2 class="panel-title">現在の登録コマンド一覧（<span id="listCount">0</span>件）</h2><div class="bulkbar"><button class="btn bulk-delete" id="clearCurrentCommands" type="button">登録コマンドを一括削除</button></div><div class="command-search"><input aria-label="コマンド一覧を検索" class="input" id="searchList" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCount">0件</span></div><div class="list command-list-scroll" id="commandList"><div class="empty-list">まだコマンドがありません。</div></div></section>
+<section class="panel"><h2 class="panel-title">現在の登録コマンド一覧（<span id="listCount">0</span>件）</h2><div class="command-search"><input aria-label="コマンド一覧を検索" class="input" id="searchList" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCount">0件</span></div><div class="list command-list-scroll" id="commandList"><div class="empty-list">まだコマンドがありません。</div></div></section>
 <section class="panel" id="libraryPanel"><div class="panel-pad"><h2>過去のコマンド保管庫（<span id="libraryCount">0</span>件）</h2><p class="subtle">保管しただけではファイルに追加されません。「＋現在に追加」で書き出し対象に入れられます。</p><input class="input" id="searchLibrary" type="search" placeholder="過去のコマンドを検索" aria-label="過去のコマンドを検索"><div class="list command-list-scroll" id="savedCommandList" style="margin-top:10px;max-height:300px"></div><h2 style="margin-top:18px">保管庫のバックアップ</h2>
 <p class="subtle">過去のコマンドはこの端末に保存されます。JSONファイルへのバックアップもできます。</p>
 <div class="two"><button class="btn btn-blue" id="saveLibrary" type="button">この端末に保存</button><button class="btn" id="backupLibrary" type="button">バックアップを書き出す</button></div>

@@ -180,27 +180,47 @@ body[data-page=existing] .stack.right{grid-column:1}
 .preset-button{background:#284862;border:1px solid #69a9db;color:#eaf7ff;min-height:46px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
 .preset-button:hover{background:#315977}
 .preset-values{font-weight:500;font-size:12px;color:#c5e8ff}
+
+/* Simplified home and direct tap-to-select workflow */
+.home-screen{max-width:870px;margin:18px auto 28px;display:grid;gap:14px}
+.home-heading{text-align:center;margin:20px 0 9px}.home-heading h2{font-size:clamp(23px,4vw,34px);margin:0 0 8px}.home-heading p{margin:0;color:#a9c5df;font-size:14px}
+.home-card{background:#15283e;border:1px solid #49617e;border-radius:16px;color:#e9f4ff;text-align:left;padding:19px 18px;min-height:88px;display:flex;align-items:center;gap:16px;width:100%;cursor:pointer}
+.home-card:active{transform:scale(.99)}.home-card b{display:block;font-size:19px;margin-bottom:5px}.home-card small{font-size:13px;color:#afc5dd;line-height:1.5}.home-symbol{border-radius:13px;background:#0e77d3;color:#fff;width:50px;height:50px;display:grid;place-items:center;font-size:27px;flex-shrink:0}
+.home-footer{font-size:12px;text-align:center;color:#819eb9;margin:4px 0}.home-back{border:1px solid #527091;color:#cceaff;background:#182d44;padding:8px 10px;border-radius:9px;font-size:13px;cursor:pointer}
+body[data-page=home] .work,body[data-page=home] .tabbar,body[data-page=home] .quickbar{display:none!important}
+body:not([data-page=home]) .home-screen{display:none!important}
+body[data-page=home] #homeBack{display:none}
+#photoCanvas{cursor:crosshair;touch-action:manipulation}
+.tap-info{border:1px solid #2271ab;border-radius:9px;background:#0e2b45;padding:10px 12px;color:#e1f4ff;font-size:13px;line-height:1.55;margin-top:9px}
+@media(max-width:690px){.home-screen{margin:12px auto 22px;gap:11px}.home-card{padding:15px 13px;min-height:80px}.home-card b{font-size:17px}.home-symbol{width:44px;height:44px;font-size:22px}.home-heading{margin:12px 0 8px}}
 </style></head><body>
 <main>
 <header>
 <div aria-hidden="true" class="brand-icon"><svg fill="none" viewbox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="5"></circle><circle cx="30" cy="30" fill="currentColor" r="6"></circle><path d="M30 2v15M30 43v15M2 30h15M43 30h15" stroke="currentColor" stroke-linecap="round" stroke-width="5"></path></svg></div>
 <div><h1>モンスト ジェスチャー設定ツール v1.0</h1><p class="lead">画像から角度を取得し、コマンドを作成・編集できます。</p></div>
 <button class="help" id="helpBtn">？ 使い方</button></header>
+<div class="home-screen" id="homeScreen"><div class="home-heading"><h2>何をしますか？</h2><p>やりたいことを選ぶだけで始められます。</p></div>
+<button class="home-card" data-home="image"><span class="home-symbol">▧</span><span><b>画像からコマンドを作る</b><small>写真を選んで、使いたい線をタップ</small></span></button>
+<button class="home-card" data-home="manual"><span class="home-symbol">↗</span><span><b>角度を入力して作る</b><small>角度・距離・時間を自分で決める</small></span></button>
+<button class="home-card" data-home="commands"><span class="home-symbol">☷</span><span><b>コマンドを保存・書き出す</b><small>現在の一覧・過去の保管庫・ファイル保存</small></span></button>
+<button class="home-card" data-home="existing"><span class="home-symbol">✎</span><span><b>ファイル内のコマンドを編集する</b><small>既存の.voicecontrolcommandsを読み込んで調整</small></span></button>
+<p class="home-footer">すべての機能は各画面で利用できます。</p></div>
+<div style="margin:4px 0 10px"><button type="button" class="home-back" id="homeBack">⌂ はじめの画面へ</button></div>
 <nav aria-label="編集モード" class="tabbar"><button class="tab active" data-tab="image">画像から設定</button><button class="tab" data-tab="manual">手動で設定</button><button class="tab" data-tab="commands">コマンド管理</button><button class="tab" data-tab="existing">既存コマンド編集</button></nav>
 <div class="quickbar" role="status"><span class="quicktext">① 設定 → ② 現在に追加 → ③ 現在の一覧だけ書き出し</span><button class="btn btn-blue" id="quickManage" type="button">コマンド管理を開く</button></div><div class="work">
 <div class="stack left">
 <section class="panel" id="imagePanel"><div class="panel-pad">
 <div class="filebar"><label class="btn btn-blue fileLabel" for="imageFile">▣ 画像を選択</label><input accept="image/*" id="imageFile" type="file"/><span class="filename" id="imageName">画像は未選択です</span><button class="btn" id="clearImage">× クリア</button></div>
-<div class="preview-holder empty" id="photoHolder"><canvas aria-label="画像上の検出結果" height="1000" id="photoCanvas" width="430"></canvas><div class="empty-display" id="emptyDisplay"><svg fill="none" height="64" stroke="currentColor" stroke-width="1.3" viewbox="0 0 24 24" width="64"><rect height="18" rx="2" width="20" x="2" y="3"></rect><circle cx="8.5" cy="8.5" r="2"></circle><path d="m3 18 6-6 4 4 3-3 5 5"></path></svg><strong>画像を選択してください</strong><span>スクリーンショットを選ぶと軌道線を検出します。</span></div><div class="photoTools" hidden="" id="photoTools"><button id="zoomIn" title="拡大">＋</button><button id="zoomOut" title="縮小">−</button><button id="zoomReset" title="全体表示">⛶</button></div></div>
-<p class="photoHints">検出がずれたら、矢印の位置をタップして指定できます。</p>
+<div class="preview-holder empty" id="photoHolder"><canvas aria-label="画像上の検出結果" height="1000" id="photoCanvas" width="430"></canvas><div class="empty-display" id="emptyDisplay"><svg fill="none" height="64" stroke="currentColor" stroke-width="1.3" viewbox="0 0 24 24" width="64"><rect height="18" rx="2" width="20" x="2" y="3"></rect><circle cx="8.5" cy="8.5" r="2"></circle><path d="m3 18 6-6 4 4 3-3 5 5"></path></svg><strong>画像を選択してください</strong><span>スクリーンショットを選んだら、線の近くをタップしてください。</span></div><div class="photoTools" hidden="" id="photoTools"><button id="zoomIn" title="拡大">＋</button><button id="zoomOut" title="縮小">−</button><button id="zoomReset" title="全体表示">⛶</button></div></div>
+<div class="tap-info">① 画像を選ぶ → ② <b>使いたい線の近くを1回タップ</b> → ③ 角度を確認。タップした場所に近い線を優先して選びます。</div>
 </div></section>
 <section class="panel hidden" id="manualPanel"><h2 class="panel-title">角度を手動で設定</h2><div class="manual-surface"><canvas aria-label="角度の大きなプレビュー" height="420" id="manualCanvas" width="470"></canvas></div><div class="panel-pad"><p class="subtle">0°＝上、90°＝右、180°＝下、270°＝左。なぞり距離を変えるとプレビューの矢印も伸び縮みします。最大距離では表示領域の端まで伸びます。</p><label class="fieldlabel" for="manualRange">角度スライダー</label><input id="manualRange" max="360" min="0" step="0.001" type="range" value="0"/></div></section>
 <section class="panel hidden" id="commandsPanel"><h2 class="panel-title">現在ファイルに入れるコマンド（<span id="currentCount">0</span>件）</h2><div class="bulkbar"><button class="btn bulk-delete" id="clearCurrentCommands" type="button" disabled>登録コマンドを一括削除</button></div><div class="command-search"><input aria-label="登録コマンドを検索" class="input" id="searchListLeft" placeholder="コマンド名で検索" type="search"/><span class="search-count" id="searchCountLeft">0件</span></div><div class="list command-list-scroll" id="commandListLeft"></div><p class="subtle" style="padding:0 14px 12px">ここにあるコマンドだけを現在の書き出し対象にします。過去のコマンドは「コマンド保管庫」から追加できます。</p></section>
 </div>
 <div class="stack middle">
 <section class="panel"><div class="panel-pad"><h2>軌道線の自動検出</h2>
-<div class="detect-row"><span style="font-size:13px;font-weight:700">◎ 青・赤の矢印からの線を検出</span><label class="toggle"><input aria-label="画像読み込み時の自動検出" checked="" id="autoToggle" type="checkbox"/><span class="track"></span></label></div>
-<details class="advanced-detect"><summary>検出方法を詳しく設定</summary><div class="source-picker"><label for="arrowSource">基準にする矢印</label><select id="arrowSource"><option selected="" value="red">赤い矢印から伸びる線（ピンク系）</option><option value="blue">青い矢印から伸びる線（黄色系）</option><option value="auto">自動で判定（赤・青両方）</option></select><button class="btn" id="pickArrow" type="button">◎ 画像で矢印の位置を1回タップ</button><button class="btn hidden" id="clearAnchor" type="button">位置指定を解除</button><div class="micro" id="arrowHint">画像の読み込み後、赤い矢印から伸びる線を優先します。</div></div></details><div class="detect-status" id="detectStatus"><span class="status-icon" id="detectIcon">◎</span><div><strong id="detectHeading">画像を選択してください</strong><span id="detectText">選択すると自動で検出します。</span></div></div>
+<div class="detect-row"><span style="font-size:13px;font-weight:700">◎ 軌道線を自動検出</span><label class="toggle"><input aria-label="画像読み込み時の自動検出" checked="" id="autoToggle" type="checkbox"/><span class="track"></span></label></div>
+<details class="advanced-detect"><summary>検出方法を詳しく設定</summary><div class="source-picker"><label for="arrowSource">検出する線の色</label><select id="arrowSource"><option selected="" value="red">赤い矢印から伸びる線（ピンク系）</option><option value="blue">青い矢印から伸びる線（黄色系）</option><option value="auto">自動で判定（赤・青両方）</option></select><button class="btn" id="pickArrow" type="button">◎ 画像で矢印の位置を1回タップ</button><button class="btn hidden" id="clearAnchor" type="button">位置指定を解除</button><div class="micro" id="arrowHint">画像の読み込み後、赤い矢印から伸びる線を優先します。</div></div></details><div class="detect-status" id="detectStatus"><span class="status-icon" id="detectIcon">◎</span><div><strong id="detectHeading">画像を選択してください</strong><span id="detectText">選択すると自動で検出します。</span></div></div>
 <div class="hidden" id="candidateArea"><div class="subtle">軌道線の候補（線の中心を表示）</div><div class="candidateBtns" id="candidateBtns"></div></div>
 <button class="btn" id="detectAgain" style="width:100%">再検出する</button>
 </div></section>
@@ -308,7 +328,7 @@ function encode64(a){let parts=[];for(let i=0;i<a.length;i+=0x6000)parts.push(St
 
 // UI and detector
 const $=id=>document.getElementById(id);
-const state={angle:0,image:null,imageName:'',lines:[],lineIndex:-1,mode:'image',zoom:1,commands:[],library:[],lastUrl:null,arrowAnchor:null,pickingArrow:false,runId:0};
+const state={angle:0,image:null,imageName:'',lines:[],lineIndex:-1,mode:'image',zoom:1,commands:[],library:[],lastUrl:null,arrowAnchor:null,pickingArrow:false,tapTarget:null,runId:0};
 const photoCanvas=$('photoCanvas'),photoCtx=photoCanvas.getContext('2d');
 const pad=(n)=>String(n).padStart(2,'0');
 function formatAngle(a){return a.toFixed(3)+'°'}
@@ -330,6 +350,9 @@ function setMode(name){
  drawCompass();drawManual();
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.tab)));
+document.querySelectorAll('[data-home]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.home)));
+$('homeBack').addEventListener('click',()=>setMode('home'));
+
 $('helpBtn').addEventListener('click',()=>alert('① 画像を選択し、基準の赤／青の矢印を選びます。\n画像内の矢印を1回タップすると優先的に検出します。\n② 複数の候補があれば選択してください。\n③ 角度を必要に応じて0.001°刻みで微調整します。\n④ コマンドを追加します。\n⑤ 元の.voicecontrolcommandsファイルを読み込み、まとめて保存します。\n\n0°は上方向、90°は右方向です。画像の解析は端末上だけで行います。'));
 $('angleNumber').addEventListener('input',()=>{const raw=$('angleNumber').value;if(raw==='')return;const n=Number(raw);if(n>=0&&n<=360&&Number.isFinite(n)){state.angle=n;$('manualRange').value=n;drawCompass();drawManual();$('previewAngle').textContent=formatAngle(currentAngle());const a=currentAngle();$('previewDirection').textContent=formatAngle(a)+' の方向';}});
 $('angleNumber').addEventListener('change',()=>setAngle(Number($('angleNumber').value)||0));
@@ -601,20 +624,32 @@ function orientLineByArrow(l){
 function detectLines(){
  if(!state.image){setDetectStatus('warn','画像がありません','先に画像を選択してください。');return}
  const id=++state.runId;
- setDetectStatus('','軌道線を解析しています','画像の斜め方向を含む直線と、赤・青の矢印側の位置を調べています。');
+ setDetectStatus('','軌道線を解析しています',state.tapTarget?'タップした位置の近くの線を探しています。':'画像内の軌道線を探しています。');
  // Let the browser paint the progress indicator before doing CPU work.
  setTimeout(()=>{
   try{
    if(id!==state.runId||!state.image)return;
    const data=buildLineEvidence(state.image),lines=[...lineCandidates(data,'pink'),...lineCandidates(data,'yellow')];
-   lines.sort((a,b)=>rankLine(b,data)-rankLine(a,data));
+   // After a tap, re-rank ALL generated candidates by proximity to the tap.
+   // This is more reliable than checking only the initially displayed top six.
+   if(state.tapTarget){
+    const target={x:state.tapTarget.x*data.W/state.tapTarget.w,y:state.tapTarget.y*data.H/state.tapTarget.h};
+    const distance=l=>distanceToSegment(target.x,target.y,{x:l.x1,y:l.y1},{x:l.x2,y:l.y2});
+    lines.sort((a,b)=>{
+     const da=distance(a),db=distance(b),limit=Math.max(13,data.W*.085);
+     const pa=da<limit?da:da*2, pb=db<limit?db:db*2;
+     return (pa-pb)||rankLine(b,data)-rankLine(a,data);
+    });
+   } else lines.sort((a,b)=>rankLine(b,data)-rankLine(a,data));
    state.lines=[];
    for(const line of lines){
     if(state.lines.some(l=>Math.abs(l.centerX-line.centerX)<9&&Math.abs(l.centerY-line.centerY)<15&&Math.abs(l.angle-line.angle)<5))continue;
     line.score=rankLine(line,data);state.lines.push(orientLineByArrow(line));if(state.lines.length>=6)break;
    }
-   if(!state.lines.length){resetDetection();setDetectStatus('warn','軌道線を特定できませんでした','矢印付近のピンク系／黄色系の軌道線を見つけられません。画像上の矢印を1回タップして再検出してください。');return}
-   updateCandidateButtons();selectedLine(0);
+   if(!state.lines.length){resetDetection();setDetectStatus('warn','軌道線を特定できませんでした','線の色を「自動で判定」に変えてもう一度画像をタップしてください。');return}
+   updateCandidateButtons();
+   if(state.tapTarget){const t={x:state.tapTarget.x*data.W/state.tapTarget.w,y:state.tapTarget.y*data.H/state.tapTarget.h};const nearest=state.lines[0];const d=distanceToSegment(t.x,t.y,{x:nearest.x1,y:nearest.y1},{x:nearest.x2,y:nearest.y2});if(d>Math.max(24,data.W*.13)){state.lineIndex=-1;drawPhoto();setDetectStatus('warn','近くに線を検出できませんでした','線の色を「自動で判定」に変更するか、線の上をもう一度タップしてください。');return}}
+   selectedLine(0);
   }catch(error){console.error(error);resetDetection();setDetectStatus('warn','検出処理でエラーが発生しました',error.message)}
  },35);
 }
@@ -625,19 +660,21 @@ $('pickArrow').addEventListener('click',()=>{if(!state.image){setDetectStatus('w
 $('clearAnchor').addEventListener('click',()=>{state.arrowAnchor=null;$('clearAnchor').classList.add('hidden');setArrowPicking(false);detectLines()});
 $('arrowSource').addEventListener('change',()=>{if(state.image)detectLines()});
 function loadPhoto(file){if(!file)return;if(!file.type.startsWith('image/')){setDetectStatus('warn','画像ではありません','JPG・PNGなどの画像を選択してください。');return}
- const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{state.image=img;state.imageName=file.name;$('imageName').textContent=file.name;state.zoom=1;state.arrowAnchor=null;$('clearAnchor').classList.add('hidden');setArrowPicking(false);photoCanvas.style.transform='scale(1)';resetDetection();showPhoto();URL.revokeObjectURL(url);if($('autoToggle').checked)detectLines();else setDetectStatus('','画像を読み込みました','自動検出がオフです。「もう一度検出」を押してください。')};img.onerror=()=>{URL.revokeObjectURL(url);setDetectStatus('warn','画像を開けません','対応する形式の画像を選択してください。')};img.src=url;
+ const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{state.image=img;state.imageName=file.name;$('imageName').textContent=file.name;state.zoom=1;state.arrowAnchor=null;state.tapTarget=null;$('clearAnchor').classList.add('hidden');setArrowPicking(false);photoCanvas.style.transform='scale(1)';resetDetection();showPhoto();URL.revokeObjectURL(url);if($('autoToggle').checked)detectLines();else setDetectStatus('','画像を読み込みました','自動検出がオフです。「もう一度検出」を押してください。')};img.onerror=()=>{URL.revokeObjectURL(url);setDetectStatus('warn','画像を開けません','対応する形式の画像を選択してください。')};img.src=url;
 }
 $('imageFile').addEventListener('change',()=>loadPhoto($('imageFile').files[0]));
-$('clearImage').addEventListener('click',()=>{state.image=null;state.arrowAnchor=null;$('clearAnchor').classList.add('hidden');setArrowPicking(false);state.runId++;$('imageFile').value='';$('imageName').textContent='画像は未選択です';resetDetection();showPhoto();setDetectStatus('','画像を待機しています','画像を選択すると軌道線を解析します。')});
-$('detectAgain').addEventListener('click',detectLines);$('clearLine').addEventListener('click',()=>{resetDetection();setDetectStatus('','検出線をリセットしました','「もう一度検出」を押すと再解析できます。')});
+$('clearImage').addEventListener('click',()=>{state.image=null;state.arrowAnchor=null;state.tapTarget=null;$('clearAnchor').classList.add('hidden');setArrowPicking(false);state.runId++;$('imageFile').value='';$('imageName').textContent='画像は未選択です';resetDetection();showPhoto();setDetectStatus('','画像を待機しています','画像を選択すると軌道線を解析します。')});
+$('detectAgain').addEventListener('click',()=>{state.tapTarget=null;detectLines()});$('clearLine').addEventListener('click',()=>{resetDetection();setDetectStatus('','検出線をリセットしました','「もう一度検出」を押すと再解析できます。')});
 $('swapPoints').addEventListener('click',()=>{setAngle(normalizeAngle(state.angle+180),'manual')});
 for(const [id,delta] of [['zoomIn',.12],['zoomOut',-.12]])$(id).addEventListener('click',()=>{state.zoom=Math.max(.65,Math.min(2.1,state.zoom+delta));photoCanvas.style.transform=`scale(${state.zoom})`});
 $('zoomReset').addEventListener('click',()=>{state.zoom=1;photoCanvas.style.transform='scale(1)'});
-photoCanvas.addEventListener('click',e=>{if(!state.image)return;const rect=photoCanvas.getBoundingClientRect();const px=(e.clientX-rect.left)/rect.width*photoCanvas.width,py=(e.clientY-rect.top)/rect.height*photoCanvas.height;
- if(state.pickingArrow){state.arrowAnchor={x:px,y:py,w:photoCanvas.width,h:photoCanvas.height};setArrowPicking(false);$('clearAnchor').classList.remove('hidden');drawPhoto();detectLines();return}
- if(!state.lines.length)return;let best=-1,dist=Infinity;
- for(let i=0;i<state.lines.length;i++){const l=state.lines[i];const d=distanceToSegment(px*l.w/photoCanvas.width,py*l.h/photoCanvas.height,{x:l.x1,y:l.y1},{x:l.x2,y:l.y2});if(d<dist){dist=d;best=i}}
- if(best>=0&&dist<photoCanvas.width*.09)selectedLine(best);
+photoCanvas.addEventListener('click',e=>{if(!state.image)return;const rect=photoCanvas.getBoundingClientRect();const fit=Math.min(rect.width/photoCanvas.width,rect.height/photoCanvas.height),left=(rect.width-photoCanvas.width*fit)/2,top=(rect.height-photoCanvas.height*fit)/2;const px=(e.clientX-rect.left-left)/fit,py=(e.clientY-rect.top-top)/fit;if(px<0||py<0||px>photoCanvas.width||py>photoCanvas.height)return;
+ if(state.pickingArrow){state.tapTarget=null;state.arrowAnchor={x:px,y:py,w:photoCanvas.width,h:photoCanvas.height};setArrowPicking(false);$('clearAnchor').classList.remove('hidden');drawPhoto();detectLines();return}
+ // A normal tap now locates the nearby line; use the point as a local focus
+ // and regenerate candidate ranking, rather than accepting the strongest global line.
+ state.tapTarget={x:px,y:py,w:photoCanvas.width,h:photoCanvas.height};
+ setDetectStatus('','タップ位置の近くを探索中','指定した場所から最も近い軌道線を探しています。');
+ detectLines();
 });
 function getSettings(){const a=currentAngle()*Math.PI/180,d=Number($('distanceRange').value),x=Number($('xRange').value),y=Number($('yRange').value);return {x,y,ex:x+Math.sin(a)*d,ey:y-Math.cos(a)*d,dur:Number($('durationRange').value),wait:Number($('delayRange').value)}}
 function readCommand(){const name=$('name').value.trim();if(!name)throw Error('音声コマンド名を入力してください');return {name,angle:state.angle,direction:$('direction').value,s:getSettings()}}
@@ -1091,7 +1128,7 @@ $('generate').addEventListener('click',async()=>{try{
  }catch(e){$('exportStatus').textContent='エラー：'+e.message;console.error(e)}
 });
 // First load: deliberately show no image.
-restoreLocalCommands();window.__libraryLoaded=true;renderCommands();setMode("image");setAngle(0);showPhoto();drawCompass();drawManual();
+restoreLocalCommands();window.__libraryLoaded=true;renderCommands();setMode("home");setAngle(0);showPhoto();drawCompass();drawManual();
 </script><script>
 (()=>{
  const b=document.getElementById('quickManage');

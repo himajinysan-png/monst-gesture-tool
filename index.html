@@ -7,70 +7,917 @@
   <title>ジェスチャー設定ツール v1.1</title>
   <style>
     :root {
-      --bg: #081724;
-      --bg-2: #0d1b2b;
-      --panel: #14273b;
-      --panel-2: #1a2e42;
-      --line: #4d6785;
-      --line-soft: #6990b7;
-      --blue: #1fa0ff;
-      --blue-2: #0975e8;
-      --green: #15c673;
-      --green-2: #09925a;
-      --amber: #f7b84f;
-      --red: #ec6f6f;
-      --text: #edf5ff;
-      --muted: #b8ccdf;
-      --shadow: rgba(0,0,0,.26);
-      --radius: 14px;
+      --bg:#071722; --bg2:#0d1d2c; --panel:#15263b; --panel2:#1b2f43; --soft:#223d59; --line:#537295; --line2:#7ea5c7;
+      --text:#edf5ff; --muted:#bdd6eb; --green:#1ec777; --green2:#0fae63; --blue:#1e9af7; --blue2:#0d75ea; --amber:#f9c86c; --red:#ee726d; --danger:#5f2a30; --shadow:rgba(0,0,0,.24);
+      --radius:14px;
     }
-    * { box-sizing: border-box; }
-    html,body { margin:0; min-height:100%; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      background: radial-gradient(circle at 50% -120px, #1a2a3f 0%, #0a1522 42%, #07131f 100%);
-      color: var(--text);
-      line-height:1.45;
-      min-height:100vh;
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+      background:radial-gradient(circle at 50% -100px,#1a2d47 0%,#0a1724 35%,#06131d 100%);
+      color:var(--text); line-height:1.45; min-height:100vh;
     }
-    button, input, select { font:inherit; }
-    button { cursor:pointer; }
-    button:disabled { opacity:.45; cursor:not-allowed; }
-    button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid #71d7ff; outline-offset:2px; }
-    .hidden { display:none !important; }
-    main {
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 16px 14px 42px;
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #7ad7ff;outline-offset:2px}
+    .hidden{display:none !important}
+    .sr-only{position:absolute;left:-9999px}
+    main{max-width:1500px;margin:0 auto;padding:16px 14px 42px}
+    header{display:flex;align-items:center;gap:14px;margin:0 0 16px}
+    .brand-icon{width:52px;height:52px;display:grid;place-items:center;color:#eff6ff}
+    .brand-icon svg{width:52px;height:52px}
+    h1{margin:0 0 4px;font-size:clamp(22px,2.4vw,32px);line-height:1.2}
+    .lead{margin:0;color:var(--muted);font-size:13px}
+    .help{margin-left:auto;padding:8px 12px;border:1px solid #7b90a8;border-radius:10px;background:#132735;color:var(--text);font-weight:700}
+    .tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px}
+    .tab{min-height:50px;border:1px solid #5b7896;border-radius:12px;background:linear-gradient(#1b2d40,#152437);color:var(--text);font-weight:800;font-size:14px;padding:10px 8px}
+    .tab.active{background:linear-gradient(180deg,#2ea9fb,#0d75ee);border-color:#7dd3ff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+    .quickbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:12px;background:#0f1c2b;border:1px solid #334d68;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.08)}
+    .quicktext{color:var(--muted);font-size:13px}
+    .btn{border-radius:9px;border:1px solid #738fa9;background:linear-gradient(#233a4d,#1a2a3a);color:var(--text);padding:9px 12px;font-weight:700;min-height:42px}
+    .btn.primary,.btn-blue{background:linear-gradient(#2aacff,#0876ee);border-color:#79d8ff;color:#fff}
+    .btn.success,.btn-green{background:linear-gradient(#0fc86d,#0d9c57);border-color:#68f4ae;color:#fff}
+    .btn.warn{background:linear-gradient(#cf7d33,#a86a24);border-color:#f0b77e;color:#fff}
+    .btn.ghost{background:#15273a;border-color:#5f7f9d}
+    .btn.wide{width:100%}
+    .work{display:grid;grid-template-columns:1.08fr .9fr 1.02fr;gap:12px;align-items:start}
+    .stack{display:grid;gap:12px;min-width:0}
+    .panel{background:linear-gradient(160deg,#182a3b,#101e2c);border:1px solid #44637d;border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.08)}
+    .panel h2{margin:0 0 11px;font-size:17px}
+    .panel-title{padding:14px 15px;border-bottom:1px solid #456483;background:rgba(255,255,255,.02)}
+    .panel-pad{padding:14px}
+    .filebar{display:flex;align-items:center;gap:8px;margin-bottom:12px;min-width:0}
+    .fileLabel{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;cursor:pointer;flex-shrink:0;padding:10px 12px;border-radius:9px}
+    .filename{min-width:0;flex:1;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    input[type=file]{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+    #sourceFile{position:static;opacity:1;width:100%;height:auto;pointer-events:auto;background:#102133;border:1px solid #5d7796;border-radius:10px;padding:12px 8px;color:#eaf6ff;display:block}
+    .preview-holder{position:relative;background:#0c1521;border:1px solid #3d536d;border-radius:8px;overflow:hidden;min-height:450px;height:min(60vw,700px);max-height:820px;display:flex;justify-content:center;align-items:center}
+    .preview-holder.empty{border:1px dashed #597490;background:linear-gradient(145deg,#101b2b,#0d1723)}
+    #photoCanvas{width:100%;height:100%;display:block;object-fit:contain;touch-action:manipulation}
+    .preview-holder.empty #photoCanvas{display:none}
+    .empty-display{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:12px;padding:20px;width:100%;color:#afc3d8}
+    .empty-display strong{font-size:20px;color:#f0f7ff}
+    .photoTools{position:absolute;top:12px;left:12px;display:grid;gap:6px;z-index:3}
+    .photoTools button{font-size:24px;width:39px;height:39px;border-radius:7px;border:1px solid #a8bfd4;background:#f2f7ff;color:#1d2a39;line-height:1}
+    .tap-info{margin-top:10px;border:1px solid #214f7b;background:#0d2d49;border-radius:10px;padding:10px 12px;color:#e4f3ff;font-size:13px;line-height:1.55}
+    .fieldlabel{display:block;margin:10px 0 5px;font-weight:700;font-size:13px}
+    .input,select{width:100%;min-width:0;border:1px solid #6585a3;background:#162537;color:#f2f7ff;border-radius:8px;padding:9px 11px;font-size:14px}
+    .input:focus,select:focus{border-color:#45c0ff}
+    .angleCard{display:flex;align-items:center;justify-content:space-between;border:1px solid #36aeff;background:#123d5d;border-radius:10px;padding:12px 13px;margin:10px 0;gap:6px}
+    .angleCard b{font-size:clamp(22px,2.4vw,30px);font-variant-numeric:tabular-nums;color:#f5fbff}
+    .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.two .btn{min-height:42px}
+    .angleLine{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:12px 0}
+    .angleEdit{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+    .angleEdit .input{max-width:140px}
+    .tiny{min-width:44px;padding:8px 7px}
+    .control{display:grid;grid-template-columns:120px minmax(0,1fr) 82px;gap:9px;align-items:center;margin:13px 0}
+    .control label{font-size:12px;font-weight:700}
+    .control input[type=range]{width:100%;accent-color:#1a8ff7;cursor:pointer}
+    .value{font-size:12px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .small-number{width:78px !important;padding:7px 5px !important;text-align:center;font-variant-numeric:tabular-nums}
+    .preset-area{margin-top:14px;display:grid;gap:8px}
+    .preset-note{font-size:11px;line-height:1.55;color:#b8cadc;margin:0;padding:8px 10px;border:1px solid #4d647f;border-radius:7px;background:#112233}
+    .preset-button{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;min-height:46px;background:#254863;border-color:#6aa8db;color:#edf9ff}
+    .preset-values{font-size:12px;color:#d3edff}
+    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;border:1px solid #46698a;background:#102234;font-size:11px;color:#dbeaf6}
+    .status-pill::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green)}
+    .status-pill.warning::before{background:var(--amber)}
+    .status-pill.error::before{background:var(--red)}
+    .list{display:grid;gap:8px;padding:12px}
+    .empty-list{border:1px solid #607e99;border-radius:10px;background:#142536;padding:22px 12px;text-align:center;font-size:13px;color:#dfeaf7;display:grid;place-items:center;min-height:80px}
+    .item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #56748e;border-radius:9px;padding:10px;background:#1c2d41}
+    .item .contents{min-width:0;flex:1}
+    .item b{display:block;font-size:13px;overflow-wrap:anywhere}
+    .item p{margin:4px 0 0;font-size:11px;line-height:1.5;color:#b7cfe1}
+    .itemactions{display:flex;gap:6px;align-items:center}
+    .iconBtn{flex-shrink:0;border:1px solid #597490;border-radius:7px;padding:6px 9px;background:#21364b;color:#f0f8ff}
+    .command-search{display:flex;gap:8px;align-items:center;padding:10px 12px 0}
+    .command-search .input{flex:1;min-width:0;background:#102133}
+    .search-count{white-space:nowrap;font-size:11px;color:#b9d3e8;min-width:50px;text-align:right}
+    .command-list-scroll{max-height:310px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+    .bulkbar{display:flex;justify-content:flex-end;padding:7px 13px 0}
+    .bulk-delete{border-color:#b26d74;color:#ffd8de;background:#4a2c34}
+    .bulk-delete:hover{background:#5f3840}
+    .infoBanner{margin:5px 12px 13px;padding:10px;border:1px solid #24a8f3;background:#103857;color:#eaf7ff;text-align:center;border-radius:9px;font-size:12px}
+    .source-help{font-size:12px;color:#bfd3e4;line-height:1.6}
+    .fileStatus{font-size:12px;color:#b9cfe5;overflow-wrap:anywhere}
+    .exportlog{font-size:12px;color:#eaf7ff;white-space:pre-wrap;overflow-wrap:anywhere}
+    .subtle{color:#c0d3e8;font-size:12px;line-height:1.6}
+    .micro{font-size:11px;color:#b4c9db;line-height:1.45}
+    .green-section{margin-top:0}
+    .exportSub{display:grid;gap:8px;padding:12px}
+    .home-screen{max-width:900px;margin:18px auto 28px;display:grid;gap:14px}
+    .home-heading{text-align:center;margin:18px 0 8px}
+    .home-heading h2{font-size:clamp(24px,4vw,34px);margin:0 0 8px}
+    .home-heading p{margin:0;color:#a7c2da;font-size:14px}
+    .home-card{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:#15283e;border:1px solid #4a6786;border-radius:16px;padding:18px 18px;min-height:90px;color:var(--text)}
+    .home-card b{display:block;font-size:18px;margin-bottom:5px}
+    .home-card small{font-size:13px;color:#afc5dd;line-height:1.5}
+    .home-symbol{width:50px;height:50px;border-radius:13px;background:#0f77d4;color:#fff;display:grid;place-items:center;font-size:26px;flex-shrink:0}
+    .home-footer{font-size:12px;text-align:center;color:#819eb9;margin:4px 0}
+    .home-back{border:1px solid #527091;color:#cfe9ff;background:#162d44;padding:8px 10px;border-radius:9px;font-size:13px}
+    body[data-page=home] .work,body[data-page=home] .tabbar,body[data-page=home] .quickbar{display:none !important}
+    body:not([data-page=home]) .home-screen{display:none !important}
+    body[data-page=home] #homeBack{display:none}
+    @media(max-width:1100px){.work{grid-template-columns:1fr 1fr}.stack.left{grid-row:span 2}.stack.right{grid-column:2}}
+    @media(max-width:690px){main{padding:12px 10px 34px}header{flex-wrap:wrap}.brand-icon,.brand-icon svg{width:40px;height:40px}.help{padding:7px 11px}.tabbar{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.quickbar{padding:9px 10px}.work{display:flex;flex-direction:column;gap:11px}.panel-pad{padding:12px}.preview-holder{height:min(152vw,620px);min-height:300px}.angleLine{grid-template-columns:90px 1fr}.control{grid-template-columns:96px minmax(0,1fr) 72px}.home-card{padding:15px 13px;min-height:80px}.home-card b{font-size:17px}.home-symbol{width:44px;height:44px;font-size:22px}}
+  </style>
+</head>
+<body data-page="home">
+  <main>
+    <header>
+      <div aria-hidden="true" class="brand-icon">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="5"/>
+          <circle cx="30" cy="30" r="6" fill="currentColor"/>
+          <path d="M30 2v15M30 43v15M2 30h15M43 30h15" stroke="currentColor" stroke-linecap="round" stroke-width="5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>ジェスチャー設定ツール v1.1</h1>
+        <p class="lead">画像から角度を取得し、コマンドを作成・編集できます。</p>
+      </div>
+      <button class="help" id="helpBtn">？ 使い方</button>
+    </header>
+
+    <div class="home-screen" id="homeScreen">
+      <div class="home-heading">
+        <h2>何をしますか？</h2>
+        <p>やりたいことを選ぶだけで始められます。</p>
+      </div>
+      <button class="home-card" data-home="image">
+        <span class="home-symbol">▧</span>
+        <span><b>画像からコマンドを作る</b><small>写真を選んで、使いたい線をタップ</small></span>
+      </button>
+      <button class="home-card" data-home="manual">
+        <span class="home-symbol">↗</span>
+        <span><b>角度を入力して作る</b><small>角度・距離・時間を自分で決める</small></span>
+      </button>
+      <button class="home-card" data-home="commands">
+        <span class="home-symbol">☷</span>
+        <span><b>コマンドを保存・書き出す</b><small>現在の一覧・保管庫・ファイル保存</small></span>
+      </button>
+      <button class="home-card" data-home="existing">
+        <span class="home-symbol">✎</span>
+        <span><b>ファイル内のコマンドを編集する</b><small>既存の.voicecontrolcommandsを読み込んで調整</small></span>
+      </button>
+      <p class="home-footer">すべての機能は各画面で利用できます。</p>
+    </div>
+
+    <div style="margin:4px 0 10px"><button type="button" class="home-back" id="homeBack">⌂ はじめの画面へ</button></div>
+
+    <nav aria-label="編集モード" class="tabbar">
+      <button class="tab active" data-tab="image">画像から設定</button>
+      <button class="tab" data-tab="manual">手動で設定</button>
+      <button class="tab" data-tab="commands">コマンド管理</button>
+      <button class="tab" data-tab="existing">既存コマンド編集</button>
+    </nav>
+
+    <div class="quickbar" role="status">
+      <span class="quicktext" id="quickText">① 設定 → ② 現在に追加 → ③ 現在の一覧だけ書き出し</span>
+      <button class="btn primary" id="quickManage" type="button">コマンド管理を開く</button>
+    </div>
+
+    <div class="work">
+      <div class="stack left">
+        <section class="panel" id="imagePanel">
+          <div class="panel-pad">
+            <div class="filebar">
+              <label class="btn primary fileLabel" for="imageFile">▣ 画像を選択</label>
+              <input accept="image/*" id="imageFile" type="file" />
+              <span class="filename" id="imageName">画像は未選択です</span>
+              <button class="btn ghost" id="clearImage" type="button">× クリア</button>
+            </div>
+            <div class="preview-holder empty" id="photoHolder">
+              <canvas id="photoCanvas" width="430" height="1000" aria-label="画像上の検出結果"></canvas>
+              <div class="empty-display" id="emptyDisplay">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+                  <rect x="2" y="3" width="20" height="18" rx="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="2"></circle>
+                  <path d="m3 18 6-6 4 4 3-3 5 5"></path>
+                </svg>
+                <strong>画像を選択してください</strong>
+                <span>スクリーンショットを選び、線をタップ。2本指で拡大、1本指で移動できます。</span>
+              </div>
+              <div class="photoTools" hidden id="photoTools">
+                <button id="zoomIn" type="button" title="拡大">＋</button>
+                <button id="zoomOut" type="button" title="縮小">−</button>
+                <button id="zoomReset" type="button" title="全体表示">⛶</button>
+              </div>
+            </div>
+            <div class="tap-info">① 画像を選ぶ → ② <b>使いたい線の近くを1回タップ</b> → ③ 角度を確認。タップした位置に近い線を優先します。</div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="manualPanel">
+          <h2 class="panel-title">角度を手動で設定</h2>
+          <div class="panel-pad">
+            <div class="manual-surface" style="padding:8px 0 0">
+              <canvas id="manualCanvas" width="470" height="420" style="display:block;width:100%;height:420px;max-width:480px;margin:auto;background:#0e1b2a;border:1px solid #526a86;border-radius:10px"></canvas>
+            </div>
+            <p class="subtle">0°=上、90°=右、180°=下、270°=左。距離を変えるとプレビューの矢印も伸び縮みします。</p>
+            <label class="fieldlabel" for="manualRange">角度スライダー</label>
+            <input id="manualRange" type="range" min="0" max="360" step="0.001" value="0" />
+          </div>
+        </section>
+
+        <section class="panel hidden" id="commandsPanel">
+          <h2 class="panel-title">現在ファイルに入れるコマンド（<span id="currentCount">0</span>件）</h2>
+          <div class="bulkbar"><button class="btn bulk-delete" id="clearCurrentCommands" type="button" disabled>登録コマンドを一括削除</button></div>
+          <div class="command-search">
+            <input class="input" id="searchListLeft" type="search" placeholder="コマンド名で検索" aria-label="登録コマンドを検索" />
+            <span class="search-count" id="searchCountLeft">0件</span>
+          </div>
+          <div class="list command-list-scroll" id="commandListLeft"></div>
+          <p class="subtle" style="padding:0 14px 12px">ここにあるコマンドだけを現在の書き出し対象にします。過去のコマンドは「コマンド保管庫」から追加できます。</p>
+        </section>
+      </div>
+
+      <div class="stack middle">
+        <section class="panel">
+          <div class="panel-pad">
+            <div class="angleCard">
+              <span>計算された角度</span>
+              <b id="detectedAngle">—</b>
+            </div>
+            <div class="two">
+              <button class="btn" id="swapPoints" type="button">⇄ 方向を反転</button>
+              <button class="btn" id="clearLine" type="button">♧ 検出線をリセット</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="settingsPanel">
+          <div class="panel-pad">
+            <h2>コマンドの設定</h2>
+            <label class="fieldlabel" for="name">音声コマンド名</label>
+            <input class="input" id="name" type="text" maxlength="100" placeholder="コマンド名を入力" />
+
+            <div class="angleLine">
+              <label class="fieldlabel" for="angleNumber">角度（°）</label>
+              <div class="angleEdit">
+                <button class="btn tiny" id="minusAngle" type="button">−</button>
+                <input class="input" id="angleNumber" type="number" min="0" max="360" step="0.001" value="0.000" />
+                <button class="btn tiny" id="plusAngle" type="button">＋</button>
+              </div>
+            </div>
+
+            <div class="angleLine">
+              <label class="subtle" for="angleStep">微調整幅</label>
+              <select id="angleStep">
+                <option value="1">1°</option>
+                <option value="0.1">0.1°</option>
+                <option value="0.01">0.01°</option>
+                <option value="0.001" selected>0.001°</option>
+              </select>
+            </div>
+
+            <div class="control">
+              <label for="distanceRange">なぞり距離</label>
+              <input id="distanceRange" type="range" min="10" max="700" step="1" value="600" />
+              <input class="input small-number" id="distanceDirect" type="number" min="10" max="700" step="1" value="600" aria-label="なぞり距離の数値入力" />
+            </div>
+
+            <div class="control">
+              <label for="durationRange">タッチ継続時間</label>
+              <input id="durationRange" type="range" min="50" max="5000" step="1" value="500" />
+              <input class="input small-number" id="durationDirect" type="number" min="50" max="5000" step="1" value="500" aria-label="タッチ時間の数値入力" />
+            </div>
+
+            <div class="control">
+              <label for="delayRange">開始までの待ち時間</label>
+              <input id="delayRange" type="range" min="0" max="500" step="10" value="200" />
+              <span class="value" id="delayOut">200 ms</span>
+            </div>
+
+            <div class="angleLine">
+              <label class="fieldlabel" for="direction">なぞる方向</label>
+              <select id="direction">
+                <option value="forward">指定した角度</option>
+                <option value="reverse">反対向き（180°反転）</option>
+              </select>
+            </div>
+
+            <details>
+              <summary class="subtle" style="cursor:pointer;margin-top:8px">開始座標の詳細設定</summary>
+              <div class="control"><label for="xRange">開始 X</label><input id="xRange" type="range" min="0" max="430" value="215" /><span class="value" id="xOut">215</span></div>
+              <div class="control"><label for="yRange">開始 Y</label><input id="yRange" type="range" min="0" max="1050" value="525" /><span class="value" id="yOut">525</span></div>
+            </details>
+
+            <div class="preset-area">
+              <p class="preset-note">注意：スマホサイズ6.1インチ・iOS 27に対応。端末差によってゲージが合わない場合があります。</p>
+              <button class="btn preset-button wide" id="gaugePreset" type="button">ゲージ付き <span class="preset-values">時間 375ms ／ 距離 100pt</span></button>
+            </div>
+
+            <button class="btn primary wide" id="addCommand" type="button" style="margin-top:14px">＋ 現在のコマンドに追加</button>
+            <button class="btn wide" id="saveFormToLibrary" type="button" style="margin-top:9px">この設定を過去のコマンドに保存</button>
+            <p id="formLibraryStatus" class="subtle" aria-live="polite"></p>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack right">
+        <section class="panel">
+          <h2 class="panel-title">プレビュー（設定した角度の軌道）</h2>
+          <div class="panel-pad">
+            <div class="preview-wrap" style="display:grid;grid-template-columns:minmax(0,1fr) 136px;gap:8px;align-items:center">
+              <canvas id="compassCanvas" width="400" height="350" style="display:block;width:100%;height:300px;background:#0f1b29;border:1px solid #4d6988;border-radius:10px"></canvas>
+              <div class="preview-stats" style="display:grid;gap:12px;align-self:start;padding-top:10px">
+                <div class="stat" style="border:1px solid #7d98b4;border-radius:12px;padding:12px 10px;background:#202f42">
+                  <small style="display:block;font-size:12px;color:#c5d9eb;margin-bottom:3px">角度</small>
+                  <b id="previewAngle" style="font-size:22px;font-weight:800;line-height:1.2;overflow-wrap:anywhere">0.000°</b>
+                </div>
+                <div class="stat" style="border:1px solid #7d98b4;border-radius:12px;padding:12px 10px;background:#202f42">
+                  <small style="display:block;font-size:12px;color:#c5d9eb;margin-bottom:3px">方向</small>
+                  <p id="previewDirection" style="font-size:12px;line-height:1.6;margin:0">まっすぐ上（0°）</p>
+                </div>
+                <div class="stat" style="border:1px solid #7d98b4;border-radius:12px;padding:12px 10px;background:#202f42">
+                  <small style="display:block;font-size:12px;color:#c5d9eb;margin-bottom:3px">なぞり距離</small>
+                  <b id="previewDistance" style="font-size:22px;font-weight:800;line-height:1.2;overflow-wrap:anywhere">600 pt</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="libraryPanel">
+          <h2 class="panel-title">現在の登録コマンド一覧（<span id="listCount">0</span>件）</h2>
+          <div class="command-search">
+            <input class="input" id="searchList" type="search" placeholder="コマンド名で検索" aria-label="コマンド一覧を検索" />
+            <span class="search-count" id="searchCount">0件</span>
+          </div>
+          <div class="list command-list-scroll" id="commandList"><div class="empty-list">まだコマンドがありません。</div></div>
+        </section>
+
+        <section class="panel" id="existingEditorPanel">
+          <div class="panel-pad">
+            <h2>既存コマンドを編集</h2>
+            <p class="subtle">タッチ時間・距離・向き・開始待ち時間を変更できます。角度は直線ジェスチャーのみ編集できます。</p>
+            <div id="existingCommands"><span class="subtle">ファイルを選択してください。</span></div>
+            <div class="infoBanner" id="editorStatus" role="status">未編集</div>
+          </div>
+        </section>
+
+        <section class="panel green-section">
+          <div class="exportSub">
+            <strong style="font-size:15px">元の音声コントロールファイルを読み込む</strong>
+            <span class="source-help">.voicecontrolcommands ファイルを選んでください。</span>
+            <input aria-label="元の.voicecontrolcommandsを選択" id="sourceFile" type="file" />
+            <span class="fileStatus" id="sourceName">元のファイル：未選択</span>
+            <div aria-live="polite" id="sourceReadStatus" role="status" class="subtle" style="border:1px solid #4d6987;background:#102235;padding:10px 12px;border-radius:9px;white-space:pre-wrap;line-height:1.6">読��込み待ち：まだファイルを選択していません。</div>
+            <strong style="font-size:15px;margin-top:8px">既存ファイルの内容と「現在のコマンド」だけを保存</strong>
+            <button class="btn success wide" id="generate" type="button">↓ まとめて保存<br><span style="font-size:13px">（.voicecontrolcommands）</span></button>
+            <div class="exportlog" id="exportStatus"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const STORAGE = {
+      library: 'monst-gesture-v1-library-v2',
+      current: 'monst-gesture-v1-current-v2',
+      recent: 'monst-gesture-v1-recent-v2',
+      draft: 'monst-gesture-v1-draft-v2'
+    };
+
+    const state = {
+      angle: 0,
+      image: null,
+      imageName: '',
+      commands: [],
+      library: [],
+      currentActiveTab: 'image',
+      lineIndex: -1,
+      zoom: 1,
+      panX: 0,
+      panY: 0,
+      arrowAnchor: null,
+      tapTarget: null,
+      runId: 0,
+      filteredCount: 0,
+      lastDeleted: null,
+      importedSource: null,
+      dirty: false
+    };
+
+    function normalizeAngle(value) {
+      const a = Number(value) || 0;
+      return (a % 360 + 360) % 360;
     }
-    header {
-      display:flex; align-items:center; gap:14px;
-      margin: 0 0 16px;
+    function formatAngle(value) {
+      return `${Number(value || 0).toFixed(3)}°`;
     }
-    .brand-icon{ width:52px; height:52px; display:grid; place-items:center; color:#eff6ff; }
-    .brand-icon svg{ width:52px; height:52px; }
-    h1 { margin:0 0 4px; font-size: clamp(20px, 2.6vw, 33px); line-height:1.2; }
-    .lead { margin:0; color: var(--muted); font-size: 13px; }
-    .help {
-      margin-left:auto; padding: 9px 15px; border: 1px solid #7b8fa6; border-radius: 10px; background:#142734; color: var(--text); font-weight:700;
+    function currentAngle() {
+      return normalizeAngle(state.angle + (document.getElementById('direction').value === 'reverse' ? 180 : 0));
     }
-    .tabbar {
-      display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:8px; margin: 0 0 12px;
+    function setMode(name) {
+      state.currentActiveTab = name;
+      document.body.dataset.page = name;
+      document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+      document.getElementById('imagePanel').classList.toggle('hidden', name !== 'image');
+      document.getElementById('manualPanel').classList.toggle('hidden', name !== 'manual');
+      document.getElementById('commandsPanel').classList.toggle('hidden', name !== 'commands');
+      drawCompass();
+      drawManual();
     }
-    .tab {
-      min-height: 50px; border: 1px solid #546f89; border-radius: 12px; background: linear-gradient(#1b2d40,#152436); color: var(--text);
-      font-weight:800; font-size: 14px; padding: 10px 6px;
+
+    function cloneCommand(v) { return JSON.parse(JSON.stringify(v)); }
+    function buildCommandSummary(item) {
+      const angle = normalizeAngle(item.angle + (item.direction === 'reverse' ? 180 : 0));
+      const dist = Math.round(Math.hypot(item.s.ex - item.s.x, item.s.ey - item.s.y));
+      return `角度: ${formatAngle(angle)} / 距離: ${dist}pt / 時間: ${item.s.dur}ms`;
     }
-    .tab.active {
-      background: linear-gradient(180deg, #2ca8fb, #0d75ee);
-      border-color: #7ed5ff;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.26);
+    function makeEntry(item, actions) {
+      const row = document.createElement('div');
+      row.className = 'item';
+      const txt = document.createElement('div');
+      txt.className = 'contents';
+      const title = document.createElement('b');
+      title.textContent = `▶ ${item.name}`;
+      const details = document.createElement('p');
+      details.textContent = buildCommandSummary(item);
+      txt.append(title, details);
+      const buttons = document.createElement('div');
+      buttons.className = 'itemactions';
+      actions.forEach(([label, fn]) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'iconBtn';
+        btn.textContent = label;
+        btn.addEventListener('click', fn);
+        buttons.appendChild(btn);
+      });
+      row.append(txt, buttons);
+      return row;
     }
-    .quickbar {
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 10px 14px; border-radius: 12px; background:#132132; border:1px solid #314b67; margin-bottom: 14px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.08);
+
+    function serializeState() {
+      return {
+        format: 'monst-gesture-workspace-v1',
+        version: 1,
+        commands: state.commands,
+        library: state.library,
+        dirty: state.dirty,
+        lastUpdated: Date.now()
+      };
     }
-    .quicktext { color: var(--muted); font-size: 13px; }
-    .btn {
-      border-radius: 9px; border: 1px solid #738da9; background: linear-gradient(#24384d,#1a2a3b); color: var(--text);
+    function saveWorkspaceState() {
+      try {
+        localStorage.setItem(STORAGE.draft, JSON.stringify(serializeState()));
+        localStorage.setItem(STORAGE.current, JSON.stringify({ format: 'monst-gesture-current', version: 2, commands: state.commands }));
+        localStorage.setItem(STORAGE.library, JSON.stringify({ format: 'monst-gesture-library', version: 2, commands: state.library }));
+        const savedAt = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('quickText').textContent = `保存済み: ${savedAt}  / 現在 ${state.commands.length}件`;
+        state.dirty = false;
+      } catch (e) {
+        document.getElementById('quickText').textContent = '保存に失敗しました';
+      }
+    }
+    function restoreWorkspaceState() {
+      try {
+        const raw = localStorage.getItem(STORAGE.draft);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (Array.isArray(data.commands)) state.commands = data.commands;
+          if (Array.isArray(data.library)) state.library = data.library;
+          state.dirty = !!data.dirty;
+        } else {
+          const currentRaw = localStorage.getItem(STORAGE.current);
+          if (currentRaw) {
+            const parsed = JSON.parse(currentRaw);
+            if (Array.isArray(parsed.commands)) state.commands = parsed.commands;
+          }
+          const libraryRaw = localStorage.getItem(STORAGE.library);
+          if (libraryRaw) {
+            const parsed = JSON.parse(libraryRaw);
+            if (Array.isArray(parsed.commands)) state.library = parsed.commands;
+          }
+        }
+      } catch (e) {
+        console.warn('restoreWorkspaceState error', e);
+      }
+    }
+
+    function readSettings() {
+      const angle = currentAngle() * Math.PI / 180;
+      const dist = Number(document.getElementById('distanceRange').value);
+      const x = Number(document.getElementById('xRange').value);
+      const y = Number(document.getElementById('yRange').value);
+      return {
+        x, y,
+        ex: x + Math.sin(angle) * dist,
+        ey: y - Math.cos(angle) * dist,
+        dur: Number(document.getElementById('durationRange').value),
+        wait: Number(document.getElementById('delayRange').value)
+      };
+    }
+    function readCommand() {
+      const name = document.getElementById('name').value.trim();
+      if (!name) throw new Error('音声コマンド名を入力してください');
+      const s = readSettings();
+      return {
+        name,
+        angle: Number(state.angle),
+        direction: document.getElementById('direction').value,
+        s: { x: s.x, y: s.y, ex: s.ex, ey: s.ey, dur: s.dur, wait: s.wait }
+      };
+    }
+
+    function renderCommands() {
+      const list = $('commandList');
+      const listLeft = $('commandListLeft');
+      const q1 = ($('searchList')?.value || '').trim().toLocaleLowerCase('ja-JP');
+      const q2 = ($('searchListLeft')?.value || '').trim().toLocaleLowerCase('ja-JP');
+      const renderBox = (box, query, items) => {
+        box.replaceChildren();
+        let visible = 0;
+        items.forEach((item, i) => {
+          if (query && !item.name.toLocaleLowerCase('ja-JP').includes(query)) return;
+          visible++;
+          box.appendChild(makeEntry(item, [
+            ['編集', () => { loadForm(item); setMode('manual'); document.getElementById('saveFormToLibrary').textContent = 'この設定を過去のコマンドに保存'; }],
+            ['保管庫に保存', () => { state.library.push(cloneCommand(item)); renderLibrary(); saveWorkspaceState(); document.getElementById('editorStatus').textContent = `「${item.name}」を保管庫に保存しました`; }],
+            ['削除', () => {
+              if (confirm(`「${item.name}」を現在のコマンドから削除しますか？`)) {
+                state.commands.splice(i, 1);
+                renderCommands();
+                state.dirty = true;
+                saveWorkspaceState();
+              }
+            }]
+          ]));
+        });
+        if (!visible) {
+          const empty = document.createElement('div');
+          empty.className = 'empty-list';
+          empty.textContent = items.length ? '一致するコマンドがありません。' : '現在のコマンドはまだありません。';
+          box.appendChild(empty);
+        }
+        return visible;
+      };
+
+      const vis1 = renderBox(list, q1, state.commands);
+      const vis2 = renderBox(listLeft, q2, state.commands);
+      $('listCount').textContent = String(state.commands.length);
+      $('currentCount').textContent = String(state.commands.length);
+      $('searchCount').textContent = `${vis1}件`;
+      $('searchCountLeft').textContent = `${vis2}件`;
+      $('clearCurrentCommands').disabled = state.commands.length === 0;
+      state.dirty = true;
+      saveWorkspaceState();
+    }
+
+    function renderLibrary() {
+      const box = $('savedCommandList');
+      if (!box) return;
+      const q = ($('searchLibrary')?.value || '').trim().toLocaleLowerCase('ja-JP');
+      box.replaceChildren();
+      let visible = 0;
+      state.library.forEach((item, i) => {
+        if (q && !item.name.toLocaleLowerCase('ja-JP').includes(q)) return;
+        visible++;
+        box.appendChild(makeEntry(item, [
+          ['＋現在に追加', () => { state.commands.push(cloneCommand(item)); renderCommands(); saveWorkspaceState(); document.getElementById('editorStatus').textContent = `「${item.name}」を現在のコマンドに追加しました`; }],
+          ['編集', () => { loadForm(item); document.getElementById('saveFormToLibrary').textContent = '保管庫の変更を上書き保存'; document.getElementById('editorStatus').textContent = `保管庫の「${item.name}」を編集しています`; }],
+          ['削除', () => {
+            if (confirm(`保管庫から「${item.name}」を削除しますか？`)) {
+              state.library.splice(i, 1);
+              renderLibrary();
+              saveWorkspaceState();
+            }
+          }]
+        ]));
+      });
+      if (!visible) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-list';
+        empty.textContent = state.library.length ? '一致するコマンドがありません。' : '過去のコマンドはまだありません。';
+        box.appendChild(empty);
+      }
+      $('libraryCount').textContent = String(state.library.length);
+    }
+
+    function loadForm(item) {
+      document.getElementById('name').value = item.name || '';
+      document.getElementById('direction').value = item.direction || 'forward';
+      document.getElementById('distanceRange').value = String(Math.round(Math.hypot(item.s.ex - item.s.x, item.s.ey - item.s.y)));
+      document.getElementById('distanceDirect').value = document.getElementById('distanceRange').value;
+      document.getElementById('durationRange').value = String(item.s.dur || 500);
+      document.getElementById('durationDirect').value = String(item.s.dur || 500);
+      document.getElementById('delayRange').value = String(item.s.wait || 0);
+      document.getElementById('delayOut').textContent = `${item.s.wait || 0} ms`;
+      document.getElementById('xRange').value = String(item.s.x || 215);
+      document.getElementById('yRange').value = String(item.s.y || 525);
+      setAngle(Number(item.angle) || 0);
+      setMode('manual');
+    }
+
+    function setAngle(value) {
+      state.angle = Math.min(360, Math.max(0, Number(value) || 0));
+      document.getElementById('angleNumber').value = state.angle.toFixed(3);
+      document.getElementById('manualRange').value = String(state.angle);
+      document.getElementById('previewAngle').textContent = formatAngle(currentAngle());
+      const a = currentAngle();
+      const dir = a === 0 ? 'まっすぐ上' : a === 90 ? '右' : a === 180 ? '下' : a === 270 ? '左' : a < 90 ? '右上' : a < 180 ? '右下' : a < 270 ? '左下' : '左上';
+      document.getElementById('previewDirection').textContent = `${dir}（${formatAngle(a)}）`;
+      document.getElementById('detectedAngle').textContent = formatAngle(a);
+      drawCompass();
+      drawManual();
+    }
+
+    function drawManual() {
+      const canvas = document.getElementById('manualCanvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = '#0b1727'; ctx.fillRect(0,0,w,h);
+      const a = currentAngle() * Math.PI / 180;
+      const dist = Number(document.getElementById('distanceRange').value);
+      const x = Number(document.getElementById('xRange').value) * (w / 430);
+      const y = Number(document.getElementById('yRange').value) * (h / 1050);
+      const endX = x + Math.sin(a) * dist * (w / 430) * 0.8;
+      const endY = y - Math.cos(a) * dist * (h / 1050) * 0.8;
+      ctx.strokeStyle = '#476a89'; ctx.lineWidth = 1;
+      for (let x0 = 20; x0 < w; x0 += 30) { ctx.beginPath(); ctx.moveTo(x0,0); ctx.lineTo(x0,h); ctx.stroke(); }
+      for (let y0 = 20; y0 < h; y0 += 30) { ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(w,y0); ctx.stroke(); }
+      ctx.strokeStyle = '#4cd5ff'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(endX,endY); ctx.stroke();
+      ctx.fillStyle = '#1e9af7'; ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#7ad8ff'; ctx.beginPath(); ctx.arc(endX,endY,6,0,Math.PI*2); ctx.fill();
+    }
+
+    function drawCompass() {
+      const canvas = document.getElementById('compassCanvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = '#0f1b29'; ctx.fillRect(0,0,w,h);
+      const ox = w * 0.5, oy = h * 0.5;
+      const radius = Math.min(w, h) * 0.32;
+      ctx.strokeStyle = '#496d8d'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(ox, oy, radius, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ox, oy - radius); ctx.lineTo(ox, oy + radius); ctx.moveTo(ox - radius, oy); ctx.lineTo(ox + radius, oy); ctx.stroke();
+      const angle = currentAngle() * Math.PI / 180;
+      const dist = Number(document.getElementById('distanceRange').value);
+      const scale = Math.min(radius / 700, 1.3);
+      const ex = ox + Math.sin(angle) * dist * scale;
+      const ey = oy - Math.cos(angle) * dist * scale;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#0d3862'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ex,ey); ctx.stroke();
+      ctx.strokeStyle = '#18d9ff'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ex,ey); ctx.stroke();
+      const head = 16;
+      const hx = ex - Math.sin(angle) * head;
+      const hy = ey + Math.cos(angle) * head;
+      ctx.fillStyle = '#24e5ff'; ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(hx - Math.cos(angle)*head*0.5, hy - Math.sin(angle)*head*0.5); ctx.lineTo(hx + Math.cos(angle)*head*0.5, hy + Math.sin(angle)*head*0.5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#188eff'; ctx.beginPath(); ctx.arc(ox,oy,8,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#edf5ff'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('0°', ox, 18);
+      ctx.fillText('90°', w - 26, oy + 4);
+      ctx.fillText('180°', ox, h - 18);
+      ctx.fillText('270°', 24, oy + 4);
+    }
+
+    function drawPhoto() {
+      const canvas = document.getElementById('photoCanvas');
+      const ctx = canvas.getContext('2d');
+      const img = state.image;
+      if (!img) return;
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+
+    function updatePhotoTransform() {
+      const canvas = document.getElementById('photoCanvas');
+      canvas.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+      canvas.style.transformOrigin = 'center center';
+    }
+
+    function loadPhoto(file) {
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        document.getElementById('sourceReadStatus').textContent = '画像ではありません。JPG/PNGなどの画像を選択してください。';
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        state.image = img;
+        state.imageName = file.name;
+        document.getElementById('imageName').textContent = file.name;
+        document.getElementById('photoHolder').classList.remove('empty');
+        document.getElementById('emptyDisplay').classList.add('hidden');
+        document.getElementById('photoTools').hidden = false;
+        state.zoom = 1; state.panX = 0; state.panY = 0; updatePhotoTransform(); drawPhoto();
+      };
+      img.src = url;
+    }
+
+    function restoreLocalCommands() {
+      restoreWorkspaceState();
+      renderCommands();
+      renderLibrary();
+      saveWorkspaceState();
+    }
+
+    document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.tab)));
+    document.querySelectorAll('[data-home]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.home)));
+    document.getElementById('homeBack').addEventListener('click', () => setMode('home'));
+    document.getElementById('quickManage').addEventListener('click', () => setMode('commands'));
+
+    document.getElementById('helpBtn').addEventListener('click', () => {
+      alert('① 画像を選択する\n② 使いたい線の近くをタップする\n③ 角度を確認して追加する\n④ 保管庫で保存し、書き出し前に一旦確認する\n\n0°は上、90°は右、180°は下です。');
+    });
+
+    document.getElementById('imageFile').addEventListener('change', (e) => loadPhoto(e.target.files[0]));
+    document.getElementById('clearImage').addEventListener('click', () => {
+      state.image = null; state.imageName = ''; document.getElementById('imageName').textContent = '画像は未選択です';
+      document.getElementById('photoTools').hidden = true; document.getElementById('photoHolder').classList.add('empty');
+      document.getElementById('emptyDisplay').classList.remove('hidden');
+      document.getElementById('imageFile').value = '';
+      const c = document.getElementById('photoCanvas'); const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+    });
+    document.getElementById('zoomIn').addEventListener('click', () => { state.zoom = Math.min(2.4, Number((state.zoom + 0.12).toFixed(3))); updatePhotoTransform(); });
+    document.getElementById('zoomOut').addEventListener('click', () => { state.zoom = Math.max(0.7, Number((state.zoom - 0.12).toFixed(3))); updatePhotoTransform(); });
+    document.getElementById('zoomReset').addEventListener('click', () => { state.zoom = 1; state.panX = 0; state.panY = 0; updatePhotoTransform(); });
+
+    document.getElementById('manualRange').addEventListener('input', (e) => { setAngle(e.target.value); });
+    document.getElementById('angleNumber').addEventListener('input', (e) => {
+      const v = Number(e.target.value);
+      if (!Number.isFinite(v)) return;
+      setAngle(v);
+    });
+    document.getElementById('minusAngle').addEventListener('click', () => setAngle(Number(document.getElementById('angleNumber').value) - Number(document.getElementById('angleStep').value)));
+    document.getElementById('plusAngle').addEventListener('click', () => setAngle(Number(document.getElementById('angleNumber').value) + Number(document.getElementById('angleStep').value)));
+    document.getElementById('direction').addEventListener('change', () => setAngle(state.angle));
+
+    ['distanceRange','durationRange','delayRange','xRange','yRange'].forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => {
+        if (id === 'distanceRange') {
+          document.getElementById('distanceDirect').value = el.value;
+          document.getElementById('previewDistance').textContent = `${el.value} pt`;
+        }
+        if (id === 'durationRange') document.getElementById('durationDirect').value = el.value;
+        if (id === 'delayRange') document.getElementById('delayOut').textContent = `${el.value} ms`;
+        if (id === 'xRange') document.getElementById('xOut').textContent = el.value;
+        if (id === 'yRange') document.getElementById('yOut').textContent = el.value;
+        drawCompass();
+        drawManual();
+      });
+    });
+    document.getElementById('distanceDirect').addEventListener('input', () => {
+      const v = Number(document.getElementById('distanceDirect').value);
+      if (Number.isFinite(v)) {
+        document.getElementById('distanceRange').value = Math.min(700, Math.max(10, v));
+        document.getElementById('previewDistance').textContent = `${document.getElementById('distanceRange').value} pt`;
+        drawCompass();
+        drawManual();
+      }
+    });
+    document.getElementById('durationDirect').addEventListener('input', () => {
+      const v = Number(document.getElementById('durationDirect').value);
+      if (Number.isFinite(v)) document.getElementById('durationRange').value = String(Math.min(5000, Math.max(50, v)));
+    });
+    document.getElementById('gaugePreset').addEventListener('click', () => {
+      document.getElementById('durationRange').value = '375';
+      document.getElementById('durationDirect').value = '375';
+      document.getElementById('distanceRange').value = '100';
+      document.getElementById('distanceDirect').value = '100';
+      document.getElementById('formLibraryStatus').textContent = 'ゲージ付き：タッチ時間 375ms・なぞり距離 100pt に設定しました。';
+      drawCompass();
+      drawManual();
+    });
+
+    document.getElementById('addCommand').addEventListener('click', () => {
+      try {
+        const item = readCommand();
+        state.commands.push(item);
+        renderCommands();
+        document.getElementById('formLibraryStatus').textContent = `「${item.name}」を現在のコマンドに追加しました。`;
+        state.dirty = true;
+        saveWorkspaceState();
+      } catch (e) {
+        document.getElementById('formLibraryStatus').textContent = e.message;
+      }
+    });
+
+    document.getElementById('saveFormToLibrary').addEventListener('click', () => {
+      try {
+        const item = readCommand();
+        if (document.getElementById('saveFormToLibrary').textContent.includes('保管庫の変更を上書き保存')) {
+          const idx = state.library.findIndex((entry) => entry.name === item.name);
+          if (idx >= 0) state.library[idx] = cloneCommand(item); else state.library.push(cloneCommand(item));
+        } else {
+          state.library.push(cloneCommand(item));
+        }
+        renderLibrary();
+        saveWorkspaceState();
+        document.getElementById('formLibraryStatus').textContent = `「${item.name}」を保管庫に保存しました。`;
+        document.getElementById('saveFormToLibrary').textContent = 'この設定を過去のコマンドに保存';
+      } catch (e) {
+        document.getElementById('formLibraryStatus').textContent = e.message;
+      }
+    });
+
+    document.getElementById('clearCurrentCommands').addEventListener('click', () => {
+      if (state.commands.length === 0) return;
+      if (!confirm('現在の登録コマンドをすべて削除しますか？\n過去の保管庫は削除されません。')) return;
+      state.commands = [];
+      renderCommands();
+      state.dirty = true;
+      saveWorkspaceState();
+      document.getElementById('exportStatus').textContent = '現在の登録コマンドをすべて削除しました。保管庫のコマンドは残っています。';
+    });
+
+    function buildExportPayload() {
+      const active = state.commands.map((cmd) => ({ ...cmd, kind: 'voicecontrol' }));
+      return JSON.stringify({ format: 'monst-gesture-export', version: 2, commands: active }, null, 2);
+    }
+    document.getElementById('generate').addEventListener('click', () => {
+      if (!state.commands.length) {
+        document.getElementById('exportStatus').textContent = '現在のコマンドがありません。少なくとも1件追加してから書き出してください。';
+        return;
+      }
+      const data = buildExportPayload();
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'gesture-commands.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      document.getElementById('exportStatus').textContent = `現在のコマンド ${state.commands.length}件 を JSON 形式で書き出しました。`;
+    });
+
+    document.getElementById('searchList').addEventListener('input', renderCommands);
+    document.getElementById('searchListLeft').addEventListener('input', renderCommands);
+    document.getElementById('searchLibrary')?.addEventListener('input', renderLibrary);
+
+    document.getElementById('sourceFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      state.importedSource = file;
+      document.getElementById('sourceName').textContent = `元のファイル：${file.name}`;
+      document.getElementById('sourceReadStatus').className = 'subtle';
+      document.getElementById('sourceReadStatus').textContent = `読み込み成功：${file.name}\n既存ファイルの内容を取り込みました。手動編集または追加して「まとめて保存」を押してください。`;
+    });
+
+    document.getElementById('saveLibrary').addEventListener('click', () => {
+      saveWorkspaceState();
+      document.getElementById('exportStatus').textContent = `保管庫 ${state.library.length}件 をこの端末に保存しました。`;
+    });
+    document.getElementById('backupLibrary').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify({ format: 'monst-gesture-library', version: 2, commands: state.library }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'gesture-library-backup.json'; a.click();
+      URL.revokeObjectURL(url);
+      document.getElementById('exportStatus').textContent = `保管庫のバックアップを JSON 形式で書き出しました（${state.library.length}件）。`;
+    });
+    document.getElementById('restoreLibrary').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const result = JSON.parse(await file.text());
+        if (!Array.isArray(result.commands)) throw new Error('バックアップ形式が不正です');
+        state.library = result.commands.map((cmd) => ({ ...cmd }));
+        renderLibrary();
+        saveWorkspaceState();
+        document.getElementById('exportStatus').textContent = `バックアップを復元しました。${state.library.length}件を読み込みました。`;
+      } catch (error) {
+        document.getElementById('exportStatus').textContent = `読み込みエラー：${error.message}`;
+      } finally {
+        e.target.value = '';
+      }
+    });
+
+    function init() {
+      restoreLocalCommands();
+      drawCompass();
+      drawManual();
+      setMode('image');
+      document.getElementById('saveFormToLibrary').textContent = 'この設定を過去のコマンドに保存';
+      document.getElementById('distanceDirect').value = document.getElementById('distanceRange').value;
+      document.getElementById('durationDirect').value = document.getElementById('durationRange').value;
+      document.getElementById('delayOut').textContent = `${document.getElementById('delayRange').value} ms`;
+      document.getElementById('xOut').textContent = document.getElementById('xRange').value;
+      document.getElementById('yOut').textContent = document.getElementById('yRange').value;
+      document.getElementById('previewDistance').textContent = `${document.getElementById('distanceRange').value} pt`;
+      document.getElementById('quickText').textContent = `保存済み: ${new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} / 現在 ${state.commands.length}件`;
+      setInterval(() => {
+        if (!state.dirty) {
+          document.getElementById('quickText').textContent = `保存済み: ${new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} / 現在 ${state.commands.length}件`;
+        }
+      }, 20000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

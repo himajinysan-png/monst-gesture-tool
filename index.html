@@ -238,7 +238,7 @@ body[data-page=home] #homeBack{display:none}
 <div class="control"><label for="yRange">開始 Y</label><input id="yRange" max="1050" min="0" type="range" value="525"/><span class="value" id="yOut">525</span></div></details>
 <div class="preset-area">
 <p class="preset-note">注意：スマホサイズ6.1インチ・iOS 27に対応。端末差によってゲージが合わない場合があります。</p>
-<button class="btn preset-button wide" id="gaugePreset" type="button">ゲージ付き <span class="preset-values">時間 450ms ／ 距離 200pt</span></button>
+<button class="btn preset-button wide" id="gaugePreset" type="button">ゲージ付き <span class="preset-values">時間 375ms ／ 距離 100pt</span></button>
 </div>
 <button class="btn btn-blue wide" id="addCommand" style="margin-top:14px">＋ 現在のコマンドに追加</button><button class="btn wide" id="saveFormToLibrary" style="margin-top:9px">この設定を過去のコマンドに保存</button><p id="formLibraryStatus" class="subtle" aria-live="polite"></p>
 
@@ -392,11 +392,11 @@ for(const kind of ['distance','duration']){
 }
 // ゲージ付き設定：表示と実際の書き出し設定を同時に更新する。
 $('gaugePreset').addEventListener('click',()=>{
- for(const [kind,value] of [['duration',450],['distance',200]]){
+ for(const [kind,value] of [['duration',375],['distance',100]]){
   const input=$(kind+'Range');input.value=String(value);
   input.dispatchEvent(new Event('input',{bubbles:true}));
  }
- $('formLibraryStatus').textContent='ゲージ付き：タッチ時間450ms・なぞり距離200ptに設定しました。';
+ $('formLibraryStatus').textContent='ゲージ付き：タッチ時間375ms・なぞり距離100ptに設定しました。';
 });
 // The preview vector length is proportional to the distance slider.
 // The touch-start marker stays fixed, and only the arrow tip moves.
